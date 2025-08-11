@@ -1,0 +1,257 @@
+﻿@model _1.Models.Customer
+@{
+    ViewData["Title"] = "Hồ sơ của tôi";
+    Layout = "~/Views/Shared/_Layout_NoSidebar.cshtml";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+            <!-- Header Section -->
+            <div class="text-center mb-5">
+                <div class="bg-custom-primary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                    <i class="bi bi-person-lines-fill text-white" style="font-size: 2rem;"></i>
+                </div>
+                <h2 class="fw-bold text-custom-primary mb-2">Hồ sơ của tôi</h2>
+                <p class="text-muted">Cập nhật thông tin cá nhân của bạn</p>
+            </div>
+
+            <!-- Success Message -->
+            @if (TempData["Message"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    @TempData["Message"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <!-- Profile Form Card -->
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-custom-primary text-white py-3">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-pencil-square me-2"></i>
+                        Thông tin cá nhân
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        <!-- Username Field -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold text-custom-primary">
+                                <i class="bi bi-person-badge me-2 text-custom-primary"></i>
+                                Tên tài khoản
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="bi bi-lock text-muted"></i>
+                                </span>
+                                <input class="form-control border-start-0 bg-light"
+                                       value="@Model.Username"
+                                       readonly
+                                       style="background-color: #f8f9fa !important;" />
+                            </div>
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Tên tài khoản không thể thay đổi
+                            </small>
+                        </div>
+
+                        <!-- Full Name Field -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold text-custom-primary">
+                                <i class="bi bi-person me-2 text-custom-primary"></i>
+                                Họ và tên
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="bi bi-person-fill text-custom-primary"></i>
+                                </span>
+                                <input class="form-control border-start-0"
+                                       name="FullName"
+                                       value="@Model.FullName"
+                                       placeholder="Nhập họ và tên của bạn" />
+                            </div>
+                        </div>
+
+                        <!-- Gender Field -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold text-custom-primary">
+                                <i class="bi bi-gender-ambiguous me-2 text-custom-primary"></i>
+                                Giới tính
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="bi bi-people text-custom-primary"></i>
+                                </span>
+                                <select class="form-select border-start-0" name="Gender">
+                                    <option value="Nam" selected="@(Model.Gender == "Nam")">
+                                        Nam
+                                    </option>
+                                    <option value="Nữ" selected="@(Model.Gender == "Nữ")">
+                                        Nữ
+                                    </option>
+                                    <option value="Khác" selected="@(Model.Gender == "Khác")">
+                                        Khác
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Birth Date Field -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold text-custom-primary">
+                                <i class="bi bi-calendar-heart me-2 text-custom-primary"></i>
+                                Ngày sinh
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="bi bi-calendar3 text-custom-primary"></i>
+                                </span>
+                                <input type="date"
+                                       class="form-control border-start-0"
+                                       name="BirthDate"
+                                       value="@(Model.BirthDate.HasValue ? Model.BirthDate.Value.ToString("yyyy-MM-dd") : "")" />
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2 mt-4">
+                            <button class="btn btn-custom-primary btn-lg py-3 fw-semibold shadow-sm" type="submit">
+                                <i class="bi bi-save me-2"></i>
+                                Lưu thay đổi
+                                <i class="bi bi-arrow-right ms-2"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Additional Info Card -->
+            <div class="card mt-4 border-0 bg-light">
+                <div class="card-body text-center py-3">
+                    <small class="text-muted">
+                        <i class="bi bi-shield-check me-1 text-custom-primary"></i>
+                        Thông tin của bạn được bảo mật và an toàn
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom Primary Color Variables */
+    :root {
+        --custom-primary: #212529;
+        --custom-primary-hover: #1a1e21;
+        --custom-primary-light: rgba(33, 37, 41, 0.1);
+        --custom-primary-shadow: rgba(33, 37, 41, 0.25);
+    }
+
+    /* Custom Primary Color Classes */
+    .text-custom-primary {
+        color: var(--custom-primary) !important;
+    }
+
+    .bg-custom-primary {
+        background-color: var(--custom-primary) !important;
+    }
+
+    .btn-custom-primary {
+        background: linear-gradient(135deg, var(--custom-primary) 0%, var(--custom-primary-hover) 100%);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+        .btn-custom-primary:hover {
+            background: linear-gradient(135deg, var(--custom-primary-hover) 0%, #16191d 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--custom-primary-shadow);
+            color: white;
+        }
+
+        .btn-custom-primary:focus {
+            box-shadow: 0 0 0 0.2rem var(--custom-primary-shadow);
+            color: white;
+        }
+
+        .btn-custom-primary:active {
+            background: var(--custom-primary-hover);
+            color: white;
+        }
+
+    /* Card Styling */
+    .card {
+        transition: transform 0.2s ease-in-out;
+        border: 1px solid rgba(33, 37, 41, 0.1);
+    }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+    .card-header.bg-custom-primary {
+        background: linear-gradient(135deg, var(--custom-primary) 0%, var(--custom-primary-hover) 100%) !important;
+        border-bottom: 1px solid var(--custom-primary-hover);
+    }
+
+    /* Form Controls */
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--custom-primary);
+        box-shadow: 0 0 0 0.2rem var(--custom-primary-shadow);
+    }
+
+    .input-group-text {
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+
+    .input-group:focus-within .input-group-text {
+        border-color: var(--custom-primary);
+        background-color: var(--custom-primary-light);
+    }
+
+    /* Header Circle Background */
+    .bg-gradient {
+        background: linear-gradient(135deg, var(--custom-primary) 0%, var(--custom-primary-hover) 100%) !important;
+    }
+
+    /* Alert Styling */
+    .alert-success {
+        border: none;
+        border-left: 4px solid #198754;
+        background-color: #d1e7dd;
+    }
+
+    /* Additional Hover Effects */
+    .form-control:hover,
+    .form-select:hover {
+        border-color: var(--custom-primary-light);
+    }
+
+    /* Icon Hover Effects */
+    .input-group-text i {
+        transition: color 0.3s ease;
+    }
+
+    .input-group:hover .input-group-text i.text-custom-primary {
+        color: var(--custom-primary-hover) !important;
+    }
+
+    /* Label Hover Effects */
+    .form-label:hover {
+        color: var(--custom-primary-hover) !important;
+    }
+
+    /* Security Info Styling */
+    .card.bg-light {
+        background-color: #f8f9fa !important;
+        border: 1px solid var(--custom-primary-light) !important;
+    }
+
+    /* Responsive Adjustments */
+
+</style>

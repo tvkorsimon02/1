@@ -1,0 +1,50 @@
+﻿@model _1.Models.Customer
+@{
+    ViewData["Title"] = "Chỉnh sửa khách hàng";
+    Layout = "~/Views/Shared/_Layout_NoSidebar.cshtml";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-3">Chỉnh sửa khách hàng</h2>
+
+    <form asp-action="Edit" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="mb-3">
+            <label class="form-label">Tên đăng nhập</label>
+            <input asp-for="Username" class="form-control" readonly />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Mật khẩu</label>
+            <input asp-for="Password" type="password" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Họ và tên</label>
+            <input asp-for="FullName" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Giới tính</label>
+            <select asp-for="Gender" class="form-select">
+                <option>Nam</option>
+                <option>Nữ</option>
+                <option>Khác</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Ngày sinh</label>
+            <input asp-for="BirthDate" type="date" class="form-control" />
+        </div>
+
+        <div class="form-check mb-3">
+            <input asp-for="Active" class="form-check-input" />
+            <label class="form-check-label">Kích hoạt</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+    </form>
+</div>

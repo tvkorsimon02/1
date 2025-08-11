@@ -1,0 +1,471 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout_NoSidebar.cshtml";
+    ViewData["Title"] = "Đăng ký";
+}
+
+<!-- Toast Notification (Optional, based on previous pages' context) -->
+@if (TempData["Message"] != null)
+{
+    <div id="toastMessage" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+        <div class="toast align-items-center text-white bg-custom-primary border-0 show shadow-lg" role="alert">
+            <div class="d-flex">
+                <div class="toast-body fw-semibold">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    @TempData["Message"]
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                        data-bs-dismiss="toast" aria-label="Đóng"></button>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+            <div class="register-card shadow-lg border-0">
+                <div class="card-header-custom text-center">
+                    <div class="header-icon-container mb-3">
+                        <i class="bi bi-person-plus-fill"></i>
+                    </div>
+                    <h2 class="header-title">Tạo tài khoản mới</h2>
+                    <p class="header-subtitle">Tham gia cùng TechGear ngay hôm nay</p>
+                </div>
+                <div class="card-body p-4 p-lg-5">
+                    <form asp-action="Register" method="post" id="registerForm" novalidate>
+                        <div class="form-floating mb-3">
+                            <input type="text" id="username" name="Username" class="form-control form-control-custom" required
+                                   placeholder="Tên tài khoản" />
+                            <label for="username">
+                                <i class="bi bi-person-circle me-2"></i>
+                                Tên tài khoản
+                            </label>
+                            <div class="invalid-feedback">
+                                Vui lòng nhập tên tài khoản.
+                            </div>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="password" id="password" name="Password" class="form-control form-control-custom" required
+                                   placeholder="Mật khẩu" />
+                            <label for="password">
+                                <i class="bi bi-shield-lock me-2"></i>
+                                Mật khẩu
+                            </label>
+                            <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                                <i class="bi bi-eye" id="passwordToggleIcon"></i>
+                            </button>
+                            <div class="invalid-feedback">
+                                Vui lòng nhập mật khẩu.
+                            </div>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="password" id="passwordConfirm" name="PasswordConfirm" class="form-control form-control-custom" required
+                                   placeholder="Nhập lại mật khẩu" />
+                            <label for="passwordConfirm">
+                                <i class="bi bi-shield-lock-fill me-2"></i>
+                                Nhập lại Mật khẩu
+                            </label>
+                            <button type="button" class="password-toggle" onclick="togglePassword('passwordConfirm')">
+                                <i class="bi bi-eye" id="passwordConfirmToggleIcon"></i>
+                            </button>
+                            <div class="invalid-feedback">
+                                Mật khẩu nhập lại không trùng khớp hoặc chưa nhập.
+                            </div>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" id="fullname" name="FullName" class="form-control form-control-custom" required
+                                   placeholder="Họ và tên" />
+                            <label for="fullname">
+                                <i class="bi bi-card-text me-2"></i>
+                                Họ và tên
+                            </label>
+                            <div class="invalid-feedback">
+                                Vui lòng nhập họ và tên.
+                            </div>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <select id="gender" name="Gender" class="form-select form-control-custom" required>
+                                <option value="" disabled selected>Chọn giới tính</option>
+                                <option value="true">Nam</option>
+                                <option value="false">Nữ</option>
+                                <option value="null">Khác</option>
+                            </select>
+                            <label for="gender">
+                                <i class="bi bi-gender-ambiguous me-2"></i>
+                                Giới tính
+                            </label>
+                            <div class="invalid-feedback">
+                                Vui lòng chọn giới tính.
+                            </div>
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            <input type="date" id="birthDate" name="BirthDate" class="form-control form-control-custom" required />
+                            <label for="birthDate">
+                                <i class="bi bi-calendar-date me-2"></i>
+                                Ngày sinh
+                            </label>
+                            <div class="invalid-feedback">
+                                Vui lòng nhập ngày sinh.
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-register w-100">
+                            <span class="btn-text">
+                                <i class="bi bi-check-circle me-2"></i>
+                                Tạo tài khoản
+                            </span>
+                            <div class="btn-loader">
+                                <div class="spinner-border spinner-border-sm" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </button>
+                    </form>
+                    <div class="divider">
+                        <span>Hoặc</span>
+                    </div>
+                    <div class="text-center">
+                        <a href="/Account/Login" class="login-link">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+                            Đã có tài khoản? Đăng nhập ngay
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom Variables */
+    :root {
+        --custom-primary: #212529;
+        --custom-primary-hover: #1a1e21;
+        --custom-primary-light: rgba(33, 37, 41, 0.1);
+        --custom-primary-shadow: rgba(33, 37, 41, 0.25);
+        --gradient-primary: linear-gradient(135deg, #212529 0%, #343a40 100%);
+        --gradient-light: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+
+    /* Main Container */
+    .register-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 15px 45px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    /* Card Header */
+    .card-header-custom {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+        position: relative;
+        border-bottom: none;
+    }
+
+    .header-icon-container {
+        width: 70px;
+        height: 70px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+        .header-icon-container i {
+            font-size: 2rem;
+            color: white;
+        }
+
+    .header-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: 1px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .header-subtitle {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+        font-weight: 300;
+    }
+
+    /* Form Styles */
+    .form-floating {
+        position: relative;
+    }
+
+    .form-control-custom {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 1.25rem 1rem 0.5rem;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+    }
+
+        .form-control-custom:focus {
+            border-color: var(--custom-primary);
+            box-shadow: 0 0 0 0.2rem var(--custom-primary-light);
+            background: white;
+            outline: none;
+        }
+
+    .form-floating label {
+        color: #6c757d;
+        font-weight: 500;
+        padding: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .form-control-custom:focus ~ label,
+    .form-control-custom:not(:placeholder-shown) ~ label {
+        color: var(--custom-primary);
+        transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+    }
+
+    /* Password Toggle */
+    .password-toggle {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #6c757d;
+        cursor: pointer;
+        z-index: 5;
+        transition: color 0.3s ease;
+    }
+
+        .password-toggle:hover {
+            color: var(--custom-primary);
+        }
+
+    /* Register Button */
+    .btn-register {
+        background: var(--gradient-primary);
+        border: none;
+        border-radius: 10px;
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px var(--custom-primary-shadow);
+    }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--custom-primary-shadow);
+            background: linear-gradient(135deg, var(--custom-primary-hover) 0%, #495057 100%);
+            color: white;
+        }
+
+        .btn-register:active {
+            transform: translateY(0);
+        }
+
+    .btn-loader {
+        display: none;
+    }
+
+    .btn-register.loading .btn-text {
+        display: none;
+    }
+
+    .btn-register.loading .btn-loader {
+        display: block;
+    }
+
+    /* Divider */
+    .divider {
+        position: relative;
+        text-align: center;
+        margin: 1.5rem 0;
+    }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #dee2e6;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 1rem;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+    /* Login Link */
+    .login-link {
+        color: var(--custom-primary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+        .login-link:hover {
+            color: var(--custom-primary-hover);
+            text-decoration: underline;
+        }
+
+    /* Toast Styling */
+    .toast.bg-custom-primary {
+        background: var(--gradient-primary) !important;
+        border-radius: 10px;
+    }
+
+    .bg-custom-primary {
+        background-color: var(--custom-primary) !important;
+    }
+
+    /* Validation Styles */
+    .form-control-custom.is-valid {
+        border-color: #198754;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='m2.3 6.73.94-.94 1.38 1.38'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+
+    .form-control-custom.is-invalid {
+        border-color: #dc3545;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 4.6 1.4 1.4M7.2 4.6l-1.4 1.4'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+</style>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Toast functionality
+            const toastEl = document.querySelector('.toast');
+            if (toastEl) {
+                const toast = new bootstrap.Toast(toastEl, {
+                    delay: 5000,
+                    animation: true
+                });
+                toast.show();
+            }
+
+            // Form validation
+            const form = document.getElementById('registerForm');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const passwordConfirmInput = document.getElementById('passwordConfirm');
+            const fullnameInput = document.getElementById('fullname');
+            const genderSelect = document.getElementById('gender');
+            const birthDateInput = document.getElementById('birthDate');
+
+            const inputs = [usernameInput, passwordInput, passwordConfirmInput, fullnameInput, genderSelect, birthDateInput];
+
+            inputs.forEach(input => {
+                input.addEventListener('blur', validateField);
+                input.addEventListener('input', clearValidation);
+                if (input.tagName === 'SELECT') {
+                    input.addEventListener('change', validateField);
+                }
+            });
+
+            form.addEventListener('submit', function (e) {
+                let isValid = true;
+                inputs.forEach(input => {
+                    if (!validateField.call(input)) {
+                        isValid = false;
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                    // Optional: Scroll to the first invalid field
+                    const firstInvalid = form.querySelector('.is-invalid');
+                    if (firstInvalid) {
+                        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                } else {
+                    showLoading();
+                    // Allow form to submit after a short delay to show loading
+                    setTimeout(() => {
+                        // Form will naturally submit if not prevented
+                    }, 1000);
+                }
+            });
+
+            function validateField() {
+                const value = this.value.trim();
+                const isRequired = this.hasAttribute('required');
+
+                this.classList.remove('is-invalid', 'is-valid'); // Clear previous state
+
+                if (isRequired && !value) {
+                    this.classList.add('is-invalid');
+                    return false;
+                }
+
+                // Specific validation for password confirmation
+                if (this.id === 'passwordConfirm') {
+                    if (value !== passwordInput.value.trim()) {
+                        this.classList.add('is-invalid');
+                        return false;
+                    }
+                }
+
+                // For select, ensure a valid option is chosen
+                if (this.tagName === 'SELECT' && this.value === '') {
+                    this.classList.add('is-invalid');
+                    return false;
+                }
+
+                this.classList.add('is-valid');
+                return true;
+            }
+
+            function clearValidation() {
+                this.classList.remove('is-invalid', 'is-valid');
+            }
+
+            function showLoading() {
+                const btn = document.querySelector('.btn-register');
+                btn.classList.add('loading');
+                btn.disabled = true;
+            }
+        });
+
+        // Password toggle function
+        function togglePassword(inputId) {
+            const passwordInput = document.getElementById(inputId);
+            const toggleIcon = document.getElementById(inputId + 'ToggleIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.className = 'bi bi-eye-slash';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.className = 'bi bi-eye';
+            }
+        }
+    </script>
+}

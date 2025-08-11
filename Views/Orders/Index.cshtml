@@ -1,0 +1,77 @@
+﻿@model List<Order>
+@{
+    ViewData["Title"] = "Danh sách đơn hàng";
+    Layout = "~/Views/Shared/_Layout_NoSidebar.cshtml";
+}
+
+<h2 class="mb-4"><i class="bi bi-bag-check me-2"></i> Danh sách đơn hàng</h2>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-4" id="orderTabs">
+    <li class="nav-item">
+        <a class="nav-link active" data-status="0" href="#">
+            Tất cả
+            <span class="badge bg-secondary">@Model.Count</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-status="1" href="#">
+            Chưa duyệt
+            <span class="badge bg-warning text-dark">@Model.Count(x => x.Status == 1)</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-status="2" href="#">
+            Đã duyệt
+            <span class="badge bg-primary">@Model.Count(x => x.Status == 2)</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-status="3" href="#">
+            Đang giao
+            <span class="badge bg-info text-dark">@Model.Count(x => x.Status == 3)</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-status="4" href="#">
+            Đã giao
+            <span class="badge bg-success">@Model.Count(x => x.Status == 4)</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-status="5" href="#">
+            Đã nhận
+            <span class="badge bg-success">@Model.Count(x => x.Status == 5)</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-status="6" href="#">
+            Đã huỷ
+            <span class="badge bg-danger">@Model.Count(x => x.Status == 6)</span>
+        </a>
+    </li>
+</ul>
+
+<!-- Table container -->
+<div id="orderTableContainer">
+    @Html.Partial("_OrderTable", Model)
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('#orderTabs .nav-link').forEach(tab => {
+            tab.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelectorAll('#orderTabs .nav-link').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+
+                const status = this.getAttribute('data-status');
+                fetch(`/Orders/LoadByStatus?status=${status}`)
+                    .then(res => res.text())
+                    .then(html => {
+                        document.querySelector('#orderTableContainer').innerHTML = html;
+                    });
+            });
+        });
+    </script>
+}

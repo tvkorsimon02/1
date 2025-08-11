@@ -1,0 +1,246 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - TechGear</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007bff; /* Blue from your logo */
+            --secondary-color: #6c757d;
+            --dark-color: #212529;
+            --light-color: #f8f9fa;
+        }
+
+        body {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background-color: var(--dark-color) !important; /* Dark background for a tech feel */
+            border-bottom: 3px solid var(--primary-color); /* Accent line */
+        }
+
+        .navbar-brand {
+            color: white !important;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+
+            .navbar-brand img {
+                /* Removed filter as the new logo is already black on white, and will be on a dark background */
+                /* Added styles for making it bigger and circular */
+                border-radius: 50% !important; /* Make it perfectly circular */
+                border: 3px solid var(--primary-color); /* Add a primary colored border */
+                padding: 2px; /* Add some padding inside the border */
+                object-fit: contain; /* Ensure the image fits within the circle */
+                background-color: white; /* Ensure white background for the logo image */
+                box-shadow: 0 0 10px rgba(0, 123, 255, 0.5); /* Subtle glowing effect */
+            }
+
+            .navbar-brand span {
+                font-weight: 900 !important; /* Make the text extra bold */
+                text-transform: uppercase; /* Ensure text is uppercase */
+                font-size: 2.2rem !important; /* Make the text larger */
+                letter-spacing: 2px; /* Add letter spacing for a striking look */
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Subtle text shadow */
+            }
+
+        .navbar .nav-link {
+            color: white !important;
+            transition: color 0.3s ease;
+        }
+
+            .navbar .nav-link:hover {
+                color: var(--primary-color) !important;
+                text-decoration: none;
+            }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+            .btn-primary:hover {
+                background-color: #0056b3; /* Darker blue on hover */
+                border-color: #0056b3;
+            }
+
+        .form-control {
+            border-radius: 0.375rem;
+            border: 1px solid #ced4da;
+        }
+
+        .input-group > .form-control:focus {
+            box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+            border-color: var(--primary-color);
+        }
+
+        .card {
+            border: none;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            background-color: white;
+        }
+
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            }
+
+        .card-img-top {
+            border-top-left-radius: 0.75rem;
+            border-top-right-radius: 0.75rem;
+            object-fit: cover;
+            height: 200px; /* Standardized height for product images */
+        }
+
+        .card-title {
+            color: var(--dark-color);
+            font-weight: 600;
+        }
+
+        .card-text.fw-bold {
+            color: var(--primary-color) !important;
+            font-size: 1.25rem;
+        }
+
+        .btn-outline-dark {
+            color: var(--dark-color);
+            border-color: var(--dark-color);
+            transition: all 0.3s ease;
+        }
+
+            .btn-outline-dark:hover {
+                background-color: var(--primary-color);
+                color: white;
+                border-color: var(--primary-color);
+            }
+
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            border-top: 3px solid var(--primary-color);
+        }
+
+        .list-group-item {
+            background-color: white;
+            border: 1px solid #eee;
+            margin-bottom: -1px; /* To prevent double borders */
+            transition: background-color 0.3s ease;
+        }
+
+            .list-group-item:first-child {
+                border-top-left-radius: 0.75rem;
+                border-top-right-radius: 0.75rem;
+            }
+
+            .list-group-item:last-child {
+                border-bottom-left-radius: 0.75rem;
+                border-bottom-right-radius: 0.75rem;
+            }
+
+            .list-group-item a {
+                color: var(--dark-color);
+                text-decoration: none;
+                display: block; /* Make the whole list item clickable */
+                padding: 0.5rem 1rem;
+            }
+
+            .list-group-item:hover {
+                background-color: var(--light-color);
+            }
+
+            .list-group-item a:hover {
+                color: var(--primary-color);
+                text-decoration: none;
+            }
+
+        .card-header {
+            background-color: var(--primary-color) !important;
+            color: white !important;
+            font-weight: 600;
+            border-top-left-radius: 0.75rem !important;
+            border-top-right-radius: 0.75rem !important;
+        }
+
+        .shadow-sm {
+            box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+        }
+
+        main {
+            flex-grow: 1;
+        }
+    </style>
+</head>
+
+
+<body>
+    <body class="d-flex flex-column min-vh-100">
+
+        @Html.Partial("_Header")
+        <main class="container my-5 flex-grow-1">
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-4">
+                    @Html.Partial("_Sidebar")
+                </div>
+                <div class="col-lg-9 col-md-8">
+                    @RenderBody()
+                </div>
+            </div>
+        </main>
+
+        @Html.Partial("_Footer")
+    </body>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    @if (TempData["Message"] != null)
+    {
+        <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
+            <div class="toast align-items-center text-bg-success border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        @TempData["Message"]
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+        <script>
+            const toastEl = document.querySelector('.toast');
+            if (toastEl) {
+                const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+                toast.show();
+            }
+        </script>
+    }
+
+</body>
+@RenderSection("Scripts", required: false)
+
+</html>@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success position-fixed start-0 bottom-0 m-3" style="z-index:1000;">
+        @TempData["Message"]
+    </div>
+    <script>
+        setTimeout(() => {
+            document.querySelector('.alert').style.opacity = '0';
+        }, 5000);
+    </script>
+}

@@ -1,0 +1,275 @@
+﻿@model List<Product>
+@{
+    ViewData["Title"] = "Trang chủ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Toast Notification -->
+@if (TempData["Message"] != null)
+{
+    <div id="toastMessage" class="toast-container position-fixed bottom-0 start-0 p-3" style="z-index: 1055;">
+        <div class="toast align-items-center text-white bg-custom-primary border-0 show shadow-lg" role="alert">
+            <div class="d-flex">
+                <div class="toast-body fw-semibold">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    @TempData["Message"]
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                        data-bs-dismiss="toast" aria-label="Đóng"></button>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- SLIDER -->
+<div id="homeCarousel" class="carousel slide carousel-fade mb-5 shadow-lg rounded-3 overflow-hidden" data-bs-ride="carousel" data-bs-interval="4000">
+    <div class="carousel-inner">
+        <div class="carousel-item active position-relative">
+            <img src="~/imgs/slide1.jpg" class="d-block w-100 carousel-img" alt="Slide 1">
+            <div class="carousel-caption d-none d-md-block bg-custom-primary bg-opacity-75 p-4 rounded carousel-caption-custom">
+                <h3 class="text-white fw-bold">Tai nghe chất lượng cao</h3>
+                <p class="text-white-50">Trải nghiệm âm thanh sống động, chân thực.</p>
+                <a href="/Products?category=2" class="btn btn-custom-primary px-4 py-2">Mua liền tay</a>
+            </div>
+        </div>
+        <div class="carousel-item position-relative">
+            <img src="~/imgs/slide2.jpg" class="d-block w-100 carousel-img" alt="Slide 2">
+            <div class="carousel-caption d-none d-md-block bg-custom-primary bg-opacity-75 p-4 rounded carousel-caption-custom">
+                <h3 class="text-white fw-bold">Chuột gaming siêu nhạy</h3>
+                <p class="text-white-50">Chiến game mượt mà, phản hồi cực nhanh.</p>
+                <a href="/Products?category=1" class="btn btn-custom-primary px-4 py-2">Xem ngay</a>
+            </div>
+        </div>
+        <div class="carousel-item position-relative">
+            <img src="~/imgs/slide3.jpg" class="d-block w-100 carousel-img" alt="Slide 3">
+            <div class="carousel-caption d-none d-md-block bg-custom-primary bg-opacity-75 p-4 rounded carousel-caption-custom">
+                <h3 class="text-white fw-bold">Bàn phím bắt mắt</h3>
+                <p class="text-white-50">Lực ấn mượt mà, Phản hồi cực nhạy.</p>
+                <a href="/Products?category=3" class="btn btn-custom-primary px-4 py-2">Xem ngay</a>
+            </div>
+        </div>
+    </div>
+    <button class="carousel-control-prev carousel-control-custom" type="button" data-bs-target="#homeCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon carousel-control-icon-custom"></span>
+    </button>
+    <button class="carousel-control-next carousel-control-custom" type="button" data-bs-target="#homeCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon carousel-control-icon-custom"></span>
+    </button>
+</div>
+
+<h3 class="mb-4 text-center text-md-start fw-bold text-custom-primary">
+    <i class="bi bi-star-fill me-2"></i>Sản phẩm nổi bật
+</h3>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info text-center py-4 rounded-3 shadow-sm" role="alert">
+        <i class="bi bi-info-circle me-2"></i>Hiện chưa có sản phẩm nổi bật nào.
+    </div>
+}
+else
+{
+    <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            @{
+                int chunkSize = 3;
+                int index = 0;
+                foreach (var group in Model.Chunk(chunkSize))
+                {
+                    var activeClass = index == 0 ? "active" : "";
+                    <div class="carousel-item @activeClass">
+                        <div class="row g-4">
+                            @foreach (var item in group)
+                            {
+                                <div class="col-md-4">
+                                    <div class="card h-100 shadow-sm border-0 product-card">
+                                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                        {
+                                            <img src="~/uploads/@item.ImageUrl"
+                                                 class="card-img-top product-img"
+                                                 alt="@item.Name" />
+                                        }
+                                        else
+                                        {
+                                            <div class="card-img-top product-img-placeholder d-flex align-items-center justify-content-center">
+                                                <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
+                                            </div>
+                                        }
+                                        <div class="card-body d-flex flex-column">
+                                            <h5 class="card-title text-truncate product-title">@item.Name</h5>
+                                            <p class="card-text fw-bold mt-auto mb-2 product-price">@string.Format("{0:N0}", item.Price) VNĐ</p>
+                                            <a href="/Home/Details/@item.Id" class="btn btn-outline-custom-primary mt-auto">
+                                                <i class="bi bi-eye me-2"></i>
+                                                Xem chi tiết
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    index++;
+                }
+            }
+        </div>
+        <button class="carousel-control-prev carousel-control-custom" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon carousel-control-icon-custom"></span>
+        </button>
+        <button class="carousel-control-next carousel-control-custom" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon carousel-control-icon-custom"></span>
+        </button>
+    </div>
+}
+
+<style>
+    /* Custom Primary Color Variables */
+    :root {
+        --custom-primary: #212529;
+        --custom-primary-hover: #1a1e21;
+        --custom-primary-light: rgba(33, 37, 41, 0.1);
+        --custom-primary-shadow: rgba(33, 37, 41, 0.15);
+        --gradient-primary: linear-gradient(135deg, #212529 0%, #343a40 100%);
+    }
+
+    /* Custom Primary Color Classes */
+    .text-custom-primary {
+        color: var(--custom-primary) !important;
+    }
+
+    .bg-custom-primary {
+        background-color: var(--custom-primary) !important;
+    }
+
+    .btn-custom-primary {
+        background: var(--gradient-primary);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        box-shadow: 0 4px 12px var(--custom-primary-shadow);
+    }
+
+        .btn-custom-primary:hover {
+            background: linear-gradient(135deg, var(--custom-primary-hover) 0%, #16191d 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px var(--custom-primary-shadow);
+            color: white;
+        }
+
+    .btn-outline-custom-primary {
+        border: 2px solid var(--custom-primary);
+        color: var(--custom-primary);
+        background: transparent;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+        .btn-outline-custom-primary:hover {
+            background: var(--custom-primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--custom-primary-shadow);
+        }
+
+    /* Toast Styling */
+    .toast.bg-custom-primary {
+        background: var(--gradient-primary) !important;
+        border-radius: 10px;
+    }
+
+    /* Carousel Image Styling */
+    .carousel-img {
+        height: 450px;
+        object-fit: cover;
+        transition: transform 0.5s ease; /* Smooth transition for image zoom */
+    }
+
+    .carousel-item.active .carousel-img {
+        transform: scale(1.02); /* Slight zoom on active slide */
+    }
+
+    /* Carousel Caption Custom */
+    .carousel-caption-custom {
+        transition: all 0.5s ease;
+        opacity: 0.9;
+    }
+
+    .carousel-item:not(.active) .carousel-caption-custom {
+        opacity: 0; /* Hide caption when not active */
+    }
+
+    /* Carousel Control Icons */
+    .carousel-control-custom {
+        width: 50px; /* Larger hit area */
+        height: 50px;
+        background: rgba(0,0,0,0.4); /* Darker background for controls */
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+
+        .carousel-control-custom:hover {
+            background: var(--custom-primary); /* Custom primary on hover */
+            transform: scale(1.1);
+        }
+
+    .carousel-control-icon-custom {
+        width: 30px;
+        height: 30px;
+        background-size: 100% 100%;
+    }
+
+    /* Product Card Styling */
+    .product-card {
+        border-radius: 15px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+    }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px var(--custom-primary-shadow);
+            border-color: var(--custom-primary);
+        }
+
+    .product-img {
+        height: 200px;
+        object-fit: contain;
+        background: #f8f8f8;
+        border-bottom: 1px solid #eee;
+        transition: transform 0.3s ease;
+    }
+
+    .product-card:hover .product-img {
+        transform: scale(1.05);
+    }
+
+    .product-img-placeholder {
+        height: 200px;
+        background: #e9ecef;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .product-title {
+        font-weight: 600;
+        color: var(--custom-primary);
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .product-price {
+        color: #dc3545; /* Keep red for price for emphasis */
+        font-size: 1.2rem;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toastEl = document.querySelector('.toast');
+            if (toastEl) {
+                const toast = new bootstrap.Toast(toastEl, { delay: 5000 });
+                toast.show();
+            }
+        });
+    </script>
+}

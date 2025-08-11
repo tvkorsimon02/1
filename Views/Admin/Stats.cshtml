@@ -1,0 +1,481 @@
+﻿@{
+    var successOrders = ViewBag.SuccessOrders as List<Order>;
+    var cancelledOrders = ViewBag.CancelledOrders as List<Order>;
+    Layout = "~/Views/Shared/_Layout_NoSidebar.cshtml";
+    var fromDateStr = ViewBag.FromDate as string; // có thể null
+    var toDateStr = ViewBag.ToDate as string;   // có thể null
+}
+
+<!-- Toast Notification -->
+@if (TempData["Message"] != null)
+{
+    <div id="toastMessage" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+        <div class="toast align-items-center text-white bg-custom-primary border-0 show shadow-lg" role="alert">
+            <div class="d-flex">
+                <div class="toast-body fw-semibold">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    @TempData["Message"]
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                        data-bs-dismiss="toast" aria-label="Đóng"></button>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="container-fluid py-4">
+    <!-- Header Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="d-flex align-items-center justify-content-between flex-wrap">
+                <div class="d-flex align-items-center mb-3 mb-sm-0">
+                    <div class="bg-custom-primary bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3"
+                         style="width: 60px; height: 60px;">
+                        <i class="bi bi-bar-chart text-white" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <div>
+                        <h2 class="fw-bold text-custom-primary mb-1">Thống kê đơn hàng</h2>
+                        <p class="text-muted mb-0">Phân tích và theo dõi hiệu suất đơn hàng</p>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <div class="badge bg-custom-primary fs-6 px-3 py-2 stats-summary-badge">
+                        <i class="bi bi-graph-up me-1"></i>
+                        Tổng: @(successOrders.Count + cancelledOrders.Count) đơn hàng
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Tabs -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <form method="get" action="@Url.Action("Stats","Admin")" class="row g-3 align-items-end">
+                        <div class="col-sm-12 col-md-4">
+                            <label class="form-label text-custom-primary fw-semibold">Từ ngày</label>
+                            <input type="date" name="fromDate" value="@(fromDateStr)" class="form-control" />
+                        </div>
+                        <div class="col-sm-12 col-md-4">
+                            <label class="form-label text-custom-primary fw-semibold">Đến ngày</label>
+                            <input type="date" name="toDate" value="@(toDateStr)" class="form-control" />
+                        </div>
+                        <div class="col-sm-12 col-md-4 d-flex gap-2">
+                            <button type="submit" class="btn btn-custom-primary mt-auto">
+                                <i class="bi bi-funnel me-2"></i>Lọc
+                            </button>
+                        </div>
+                    </form>
+
+                    @if (!string.IsNullOrEmpty(fromDateStr) && !string.IsNullOrEmpty(toDateStr))
+                    {
+                        <div class="mt-3 text-muted">
+                            Đang xem dữ liệu từ <span class="fw-semibold">
+                                @DateTime.Parse(fromDateStr).ToString("dd/MM/yyyy")
+                            </span> đến <span class="fw-semibold">
+                                @DateTime.Parse(toDateStr).ToString("dd/MM/yyyy")
+                            </span>.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="row">
+        <div class="col-12">
+            <!-- Tabs header -->
+            <div class="row mb-3">
+                <div class="col-12">
+                    <ul class="nav nav-tabs nav-tabs-custom border-0" id="statsTabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active d-flex align-items-center" data-bs-toggle="tab" href="#successTab" role="tab">
+                                <i class="bi bi-check-circle me-2"></i>
+                                Đơn thành công
+                                <span class="badge bg-white text-custom-primary ms-2">@successOrders.Count</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" data-bs-toggle="tab" href="#cancelTab" role="tab">
+                                <i class="bi bi-x-circle me-2"></i>
+                                Đơn bị hủy
+                                <span class="badge bg-white text-custom-primary ms-2">@cancelledOrders.Count</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="tab-content">
+                <!-- Thành công -->
+                <div class="tab-pane fade show active" id="successTab">
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-header bg-success bg-opacity-10 border-0 py-3">
+                            <h6 class="mb-0 text-success fw-semibold">
+                                <i class="bi bi-graph-up me-2"></i>
+                                Biểu đồ đơn hàng thành công
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="successChart" height="100"></canvas>
+                        </div>
+                    </div>
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-light border-0 py-3">
+                            <h6 class="mb-0 text-custom-primary fw-semibold">
+                                <i class="bi bi-list-check me-2"></i>
+                                Danh sách đơn hàng thành công
+                            </h6>
+                        </div>
+                        <div class="card-body p-0">
+                            @if (!successOrders.Any())
+                            {
+                                <div class="py-4 text-center text-muted">
+                                    <i class="bi bi-info-circle text-custom-primary mb-3" style="font-size: 2rem;"></i>
+                                    <h5 class="text-custom-primary fw-semibold">Không có đơn hàng thành công nào.</h5>
+                                    <p class="text-muted mb-0">Dữ liệu thống kê chưa có.</p>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0 stats-table">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Mã đơn</th>
+                                                <th>Khách hàng</th>
+                                                <th>Ngày tạo</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var o in successOrders)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <a href="@Url.Action("OrderDetails", "Admin", new { id = o.Id })" class="text-decoration-none text-primary fw-semibold">
+                                                            @o.Id
+                                                        </a>
+                                                    </td>
+                                                    <td>@o.Username</td>
+                                                    <td>@o.Created_Date.ToString("dd/MM/yyyy HH:mm")</td>
+                                                </tr>
+                                            }
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bị hủy -->
+                <div class="tab-pane fade" id="cancelTab">
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-header bg-danger bg-opacity-10 border-0 py-3">
+                            <h6 class="mb-0 text-danger fw-semibold">
+                                <i class="bi bi-graph-down me-2"></i>
+                                Biểu đồ đơn hàng bị hủy
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="cancelChart" height="100"></canvas>
+                        </div>
+                    </div>
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-light border-0 py-3">
+                            <h6 class="mb-0 text-custom-primary fw-semibold">
+                                <i class="bi bi-list-check me-2"></i>
+                                Danh sách đơn hàng bị hủy
+                            </h6>
+                        </div>
+                        <div class="card-body p-0">
+                            @if (!cancelledOrders.Any())
+                            {
+                                <div class="py-4 text-center text-muted">
+                                    <i class="bi bi-info-circle text-custom-primary mb-3" style="font-size: 2rem;"></i>
+                                    <h5 class="text-custom-primary fw-semibold">Không có đơn hàng bị hủy nào.</h5>
+                                    <p class="text-muted mb-0">Dữ liệu thống kê chưa có.</p>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0 stats-table">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Mã đơn</th>
+                                                <th>Khách hàng</th>
+                                                <th>Ngày tạo</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var o in cancelledOrders)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <a href="@Url.Action("OrderDetails", "Admin", new { id = o.Id })" class="text-decoration-none text-danger fw-semibold">
+                                                            @o.Id
+                                                        </a>
+                                                    </td>
+                                                    <td>@o.Username</td>
+                                                    <td>@o.Created_Date.ToString("dd/MM/yyyy HH:mm")</td>
+                                                </tr>
+                                            }
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom Primary Color Variables */
+    :root {
+        --custom-primary: #212529;
+        --custom-primary-hover: #1a1e21;
+        --custom-primary-light: rgba(33, 37, 41, 0.1);
+        --custom-primary-shadow: rgba(33, 37, 41, 0.15);
+        --gradient-primary: linear-gradient(135deg, #212529 0%, #343a40 100%);
+    }
+
+    /* Custom Primary Color Classes */
+    .text-custom-primary {
+        color: var(--custom-primary) !important;
+    }
+
+    .bg-custom-primary {
+        background-color: var(--custom-primary) !important;
+    }
+
+    .badge.bg-custom-primary {
+        background-color: var(--custom-primary) !important;
+        color: white;
+    }
+
+    /* Header Styling */
+    .bg-gradient {
+        background: var(--gradient-primary) !important;
+    }
+
+    /* Custom Nav Tabs */
+    .nav-tabs-custom {
+        background-color: #f8f9fa;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+        .nav-tabs-custom .nav-item {
+            flex-grow: 1;
+            flex-basis: 0;
+            min-width: fit-content;
+        }
+
+        .nav-tabs-custom .nav-link {
+            border: none;
+            border-radius: 0.375rem;
+            color: #6c757d;
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+            margin: 0.25rem;
+            transition: all 0.3s ease;
+            background-color: transparent;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .nav-tabs-custom .nav-link:hover {
+                background-color: var(--custom-primary-light);
+                color: var(--custom-primary);
+                transform: translateY(-1px);
+            }
+
+            .nav-tabs-custom .nav-link.active {
+                background: var(--gradient-primary);
+                color: white;
+                box-shadow: 0 2px 8px var(--custom-primary-shadow);
+                transform: translateY(-2px);
+            }
+
+                .nav-tabs-custom .nav-link.active .badge {
+                    background-color: white !important;
+                    color: var(--custom-primary) !important;
+                }
+
+    /* Card Styling */
+    .card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important;
+        }
+
+    /* Toast Styling */
+    .toast.bg-custom-primary {
+        background: var(--gradient-primary) !important;
+        border-radius: 0.5rem;
+    }
+
+    /* Badge Styling */
+    .badge {
+        font-size: 0.75rem;
+        font-weight: 500;
+        border-radius: 0.375rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    /* Header Badge */
+    .stats-summary-badge {
+        font-size: 0.9rem !important;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        background: var(--gradient-primary) !important;
+        box-shadow: 0 2px 8px var(--custom-primary-shadow);
+    }
+
+    /* Card Headers */
+    .card-header {
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+        .card-header h6 {
+            font-size: 0.95rem;
+            letter-spacing: 0.025em;
+        }
+
+    /* Table Styling */
+    .stats-table thead th {
+        font-weight: 600;
+        color: var(--custom-primary);
+        border-bottom: 2px solid var(--custom-primary-light);
+    }
+
+    .stats-table tbody td {
+        padding: 1rem 0.75rem;
+        vertical-align: middle;
+    }
+
+    .stats-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* No animations */
+    .tab-pane {
+        transition: opacity 0.3s ease-in-out;
+    }
+
+        .tab-pane:not(.show) {
+            opacity: 0;
+        }
+</style>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Toast functionality
+            const toastEl = document.querySelector('.toast');
+            if (toastEl) {
+                const toast = new bootstrap.Toast(toastEl, {
+                    delay: 5000,
+                    animation: true
+                });
+                toast.show();
+            }
+
+            // Chart.js data and initialization
+            const successLabels = @Html.Raw(Json.Serialize(successOrders.GroupBy(x => x.Created_Date.Date).Select(g => g.Key.ToString("dd/MM"))));
+            const successData = @Html.Raw(Json.Serialize(successOrders.GroupBy(x => x.Created_Date.Date).Select(g => g.Count())));
+            const cancelLabels = @Html.Raw(Json.Serialize(cancelledOrders.GroupBy(x => x.Created_Date.Date).Select(g => g.Key.ToString("dd/MM"))));
+            const cancelData = @Html.Raw(Json.Serialize(cancelledOrders.GroupBy(x => x.Created_Date.Date).Select(g => g.Count())));
+
+                    new Chart(document.getElementById('successChart'), {
+            type: 'bar',
+            data: {
+                labels: successLabels,
+                datasets: [{
+                    label: 'Đơn thành công',
+                    data: successData,
+                    // giống style bên hủy nhưng xanh lá
+                    backgroundColor: 'rgba(25,135,84,0.6)',  // xanh bootstrap success
+                    borderColor: '#198754',
+                    borderWidth: 1,
+                    borderRadius: 8,
+                    maxBarThickness: 36,
+                    categoryPercentage: 0.6,
+                    barPercentage: 0.9
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('vi-VN')}`
+                        }
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { beginAtZero: true, ticks: { precision: 0 } }
+                }
+            }
+        });
+
+
+                    new Chart(document.getElementById('cancelChart'), {
+            type: 'bar',
+            data: {
+                labels: cancelLabels,
+                datasets: [{
+                    label: 'Đơn bị hủy',
+                    data: cancelData,
+                    backgroundColor: 'rgba(220,53,69,0.6)', // đỏ
+                    borderColor: '#dc3545',
+                    borderWidth: 1,
+                    borderRadius: 8,
+                    maxBarThickness: 36,
+                    categoryPercentage: 0.6,
+                    barPercentage: 0.9
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('vi-VN')}`
+                        }
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { beginAtZero: true, ticks: { precision: 0 } }
+                }
+            }
+        });
+        });
+    </script>
+}

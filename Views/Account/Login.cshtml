@@ -1,0 +1,706 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout_NoSidebar.cshtml";
+    ViewData["Title"] = "Đăng nhập";
+}
+
+<!-- Toast Notification -->
+@if (TempData["Message"] != null)
+{
+    <div id="toastMessage" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+        <div class="toast align-items-center text-white bg-custom-primary border-0 show shadow-lg" role="alert">
+            <div class="d-flex">
+                <div class="toast-body fw-semibold">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    @TempData["Message"]
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                        data-bs-dismiss="toast" aria-label="Đóng"></button>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-11">
+            <div class="login-main-container">
+                <div class="row g-0 h-100">
+                    <!-- Left Panel - Welcome Section -->
+                    <div class="col-lg-6 login-left-panel d-flex align-items-center justify-content-center">
+                        <div class="welcome-content text-center p-4">
+                            <div class="brand-section mb-4">
+                                <div class="brand-icon-container mb-3">
+                                    <div class="brand-icon">
+                                        <i class="bi bi-gear-fill"></i>
+                                    </div>
+                                    <div class="brand-glow"></div>
+                                </div>
+                                <h1 class="brand-title">TECHGEAR</h1>
+                                <p class="brand-subtitle">Nơi công nghệ gặp gỡ đam mê</p>
+                            </div>
+
+                            <div class="features-section mb-4">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="feature-card">
+                                            <div class="feature-icon-wrapper">
+                                                <i class="bi bi-mouse2"></i>
+                                            </div>
+                                            <h6>Gaming Gear</h6>
+                                            <p>Chuột, bàn phím gaming chuyên nghiệp</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="feature-card">
+                                            <div class="feature-icon-wrapper">
+                                                <i class="bi bi-headphones"></i>
+                                            </div>
+                                            <h6>Audio Pro</h6>
+                                            <p>Tai nghe, loa chất lượng cao</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="feature-card">
+                                            <div class="feature-icon-wrapper">
+                                                <i class="bi bi-cpu"></i>
+                                            </div>
+                                            <h6>Tech Parts</h6>
+                                            <p>Linh kiện máy tính hiện đại</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="stats-section">
+                                <div class="row text-center g-0">
+                                    <div class="col-4">
+                                        <div class="stat-number">10K+</div>
+                                        <div class="stat-label">Khách hàng</div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="stat-number">500+</div>
+                                        <div class="stat-label">Sản phẩm</div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="stat-number">99%</div>
+                                        <div class="stat-label">Hài lòng</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Animated Background Elements -->
+                        <div class="floating-elements">
+                            <div class="floating-element" style="top: 10%; left: 10%;"></div>
+                            <div class="floating-element" style="top: 20%; right: 15%;"></div>
+                            <div class="floating-element" style="bottom: 30%; left: 20%;"></div>
+                            <div class="floating-element" style="bottom: 10%; right: 10%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel - Login Form -->
+                    <div class="col-lg-6 login-right-panel d-flex align-items-center justify-content-center">
+                        <div class="login-form-container w-100">
+                            <div class="login-header text-center mb-4">
+                                <div class="login-icon-container mb-3">
+                                    <i class="bi bi-box-arrow-in-right"></i>
+                                </div>
+                                <h2 class="login-title">Chào mừng trở lại!</h2>
+                                <p class="login-subtitle">Đăng nhập để tiếp tục mua sắm</p>
+                            </div>
+
+                            <form method="post" asp-action="Login" class="login-form" novalidate>
+                                <div class="form-floating mb-3">
+                                    <input type="text"
+                                           name="username"
+                                           class="form-control form-control-custom"
+                                           id="username"
+                                           placeholder="Tên tài khoản"
+                                           required>
+                                    <label for="username">
+                                        <i class="bi bi-person-circle me-2"></i>
+                                        Tên tài khoản
+                                    </label>
+                                    <div class="invalid-feedback">
+                                        Vui lòng nhập tên tài khoản
+                                    </div>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <input type="password"
+                                           name="password"
+                                           class="form-control form-control-custom"
+                                           id="password"
+                                           placeholder="Mật khẩu"
+                                           required>
+                                    <label for="password">
+                                        <i class="bi bi-shield-lock me-2"></i>
+                                        Mật khẩu
+                                    </label>
+                                    <button type="button" class="password-toggle" onclick="togglePassword()">
+                                        <i class="bi bi-eye" id="passwordToggleIcon"></i>
+                                    </button>
+                                    <div class="invalid-feedback">
+                                        Vui lòng nhập mật khẩu
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="rememberMe" name="rememberMe">
+                                        <label class="form-check-label" for="rememberMe">
+                                            Ghi nhớ đăng nhập
+                                        </label>
+                                    </div>
+                                    <a href="#" class="forgot-password-link">Quên mật khẩu?</a>
+                                </div>
+
+                                <button type="submit" class="btn btn-login w-100 mb-3">
+                                    <span class="btn-text">
+                                        <i class="bi bi-box-arrow-in-right me-2"></i>
+                                        Đăng nhập
+                                    </span>
+                                    <div class="btn-loader">
+                                        <div class="spinner-border spinner-border-sm" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                </button>
+                            </form>
+
+                          
+
+                            <div class="register-section text-center">
+                                <p class="register-text">
+                                    Chưa có tài khoản?
+                                    <a href="/Account/Register" class="register-link">
+                                        Đăng ký ngay
+                                        <i class="bi bi-arrow-right ms-1"></i>
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom Variables */
+    :root {
+        --custom-primary: #212529;
+        --custom-primary-hover: #1a1e21;
+        --custom-primary-light: rgba(33, 37, 41, 0.1);
+        --custom-primary-shadow: rgba(33, 37, 41, 0.25);
+        --gradient-primary: linear-gradient(135deg, #212529 0%, #343a40 100%);
+        --gradient-light: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+
+    /* Main Container */
+    .login-main-container {
+        min-height: 600px;
+        max-height: 800px;
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    /* Left Panel Styles */
+    .login-left-panel {
+        background: var(--gradient-primary);
+        position: relative;
+        overflow: hidden;
+        min-height: 600px;
+    }
+
+        .login-left-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 50%);
+        }
+
+    .welcome-content {
+        position: relative;
+        z-index: 2;
+        color: white;
+        max-width: 400px;
+    }
+
+    /* Brand Section */
+    .brand-icon-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .brand-icon {
+        font-size: 3rem;
+        color: white;
+        position: relative;
+        z-index: 2;
+        animation: rotate 20s linear infinite;
+    }
+
+    .brand-glow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 80px;
+        height: 80px;
+        background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        animation: pulse 3s ease-in-out infinite;
+    }
+
+    .brand-title {
+        font-size: 2.5rem;
+        font-weight: 900;
+        letter-spacing: 2px;
+        text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        margin-bottom: 0.5rem;
+        background: linear-gradient(45deg, #fff, #f8f9fa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .brand-subtitle {
+        font-size: 1rem;
+        opacity: 0.9;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    /* Features Section */
+    .feature-card {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 12px;
+        padding: 1rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        margin-bottom: 0.5rem;
+    }
+
+        .feature-card:hover {
+            transform: translateY(-3px);
+            background: rgba(255,255,255,0.15);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+    .feature-icon-wrapper {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: rgba(255,255,255,0.9);
+    }
+
+    .feature-card h6 {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        color: white;
+        font-size: 0.9rem;
+    }
+
+    .feature-card p {
+        font-size: 0.8rem;
+        opacity: 0.8;
+        margin: 0;
+    }
+
+    /* Stats Section */
+    .stats-section {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 12px;
+        padding: 1.5rem;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: white;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        opacity: 0.8;
+        margin-top: 0.25rem;
+    }
+
+    /* Floating Elements */
+    .floating-elements {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+    }
+
+    .floating-element {
+        position: absolute;
+        width: 15px;
+        height: 15px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+
+        .floating-element:nth-child(2) {
+            animation-delay: -2s;
+        }
+
+        .floating-element:nth-child(3) {
+            animation-delay: -4s;
+        }
+
+        .floating-element:nth-child(4) {
+            animation-delay: -6s;
+        }
+
+    /* Right Panel Styles */
+    .login-right-panel {
+        background: white;
+        padding: 2rem;
+        min-height: 600px;
+    }
+
+    .login-form-container {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    /* Login Header */
+    .login-icon-container {
+        width: 60px;
+        height: 60px;
+        background: var(--gradient-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        box-shadow: 0 8px 25px var(--custom-primary-shadow);
+    }
+
+        .login-icon-container i {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+    .login-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--custom-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .login-subtitle {
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+
+    /* Form Styles */
+    .form-floating {
+        position: relative;
+    }
+
+    .form-control-custom {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 1.25rem 1rem 0.5rem;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+    }
+
+        .form-control-custom:focus {
+            border-color: var(--custom-primary);
+            box-shadow: 0 0 0 0.2rem var(--custom-primary-light);
+            background: white;
+            outline: none;
+        }
+
+    .form-floating label {
+        color: #6c757d;
+        font-weight: 500;
+        padding: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .form-control-custom:focus ~ label,
+    .form-control-custom:not(:placeholder-shown) ~ label {
+        color: var(--custom-primary);
+        transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+    }
+
+    /* Password Toggle */
+    .password-toggle {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #6c757d;
+        cursor: pointer;
+        z-index: 5;
+        transition: color 0.3s ease;
+    }
+
+        .password-toggle:hover {
+            color: var(--custom-primary);
+        }
+
+    /* Form Check */
+    .form-check-input:checked {
+        background-color: var(--custom-primary);
+        border-color: var(--custom-primary);
+    }
+
+    .form-check-label {
+        font-size: 0.9rem;
+    }
+
+    .forgot-password-link {
+        color: var(--custom-primary);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+        .forgot-password-link:hover {
+            color: var(--custom-primary-hover);
+            text-decoration: underline;
+        }
+
+    /* Login Button */
+    .btn-login {
+        background: var(--gradient-primary);
+        border: none;
+        border-radius: 10px;
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px var(--custom-primary-shadow);
+    }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--custom-primary-shadow);
+            background: linear-gradient(135deg, var(--custom-primary-hover) 0%, #495057 100%);
+            color: white;
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+    .btn-loader {
+        display: none;
+    }
+
+    .btn-login.loading .btn-text {
+        display: none;
+    }
+
+    .btn-login.loading .btn-loader {
+        display: block;
+    }
+
+    /* Social Login */
+    .btn-social {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 0.75rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .btn-google {
+        color: #db4437;
+        border-color: #db4437;
+    }
+
+        .btn-google:hover {
+            background: #db4437;
+            color: white;
+        }
+
+    .btn-facebook {
+        color: #4267B2;
+        border-color: #4267B2;
+    }
+
+        .btn-facebook:hover {
+            background: #4267B2;
+            color: white;
+        }
+
+    /* Divider */
+    .divider {
+        position: relative;
+        text-align: center;
+        margin: 1.5rem 0;
+    }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #dee2e6;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 1rem;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+    /* Register Section */
+    .register-text {
+        color: #6c757d;
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    .register-link {
+        color: var(--custom-primary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+        .register-link:hover {
+            color: var(--custom-primary-hover);
+            text-decoration: underline;
+        }
+
+    /* Toast Styling */
+    .toast.bg-custom-primary {
+        background: var(--gradient-primary) !important;
+        border-radius: 10px;
+    }
+
+    .bg-custom-primary {
+        background-color: var(--custom-primary) !important;
+    }
+
+    /* Animations */
+    
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Form validation
+        const form = document.querySelector('.login-form');
+        const inputs = form.querySelectorAll('.form-control-custom');
+
+        // Add real-time validation
+        inputs.forEach(input => {
+            input.addEventListener('blur', validateField);
+            input.addEventListener('input', clearValidation);
+        });
+
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            let isValid = true;
+            inputs.forEach(input => {
+                if (!validateField.call(input)) {
+                    isValid = false;
+                }
+            });
+
+            if (isValid) {
+                showLoading();
+                // Submit form after delay to show loading
+                setTimeout(() => {
+                    form.submit();
+                }, 1000);
+            }
+        });
+
+        function validateField() {
+            const value = this.value.trim();
+            const isRequired = this.hasAttribute('required');
+
+            if (isRequired && !value) {
+                this.classList.add('is-invalid');
+                return false;
+            } else {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+                return true;
+            }
+        }
+
+        function clearValidation() {
+            this.classList.remove('is-invalid', 'is-valid');
+        }
+
+        function showLoading() {
+            const btn = document.querySelector('.btn-login');
+            btn.classList.add('loading');
+            btn.disabled = true;
+        }
+
+        // Toast functionality
+        const toastEl = document.querySelector('.toast');
+        if (toastEl) {
+            const toast = new bootstrap.Toast(toastEl, {
+                delay: 5000,
+                animation: true
+            });
+            toast.show();
+        }
+
+        // Animate elements on load
+        const cards = document.querySelectorAll('.feature-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 150);
+        });
+    });
+
+    // Password toggle function
+    function togglePassword() {
+        const passwordInput = document.getElementById('password');
+        const toggleIcon = document.getElementById('passwordToggleIcon');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.className = 'bi bi-eye-slash';
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.className = 'bi bi-eye';
+        }
+    }
+</script>

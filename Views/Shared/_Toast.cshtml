@@ -1,0 +1,39 @@
+﻿@* Views/Shared/_Toast.cshtml *@
+@if (TempData["Message"] != null)
+{
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1060;">
+        <div class="toast align-items-center text-white bg-dark border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body fw-semibold">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    @TempData["Message"]
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                        data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* hiệu ứng trượt lên + mờ dần */
+        .toast {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: all .45s ease;
+        }
+
+            .toast.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const el = document.querySelector('.toast-container .toast');
+            if (!el) return;
+            const toast = new bootstrap.Toast(el, { delay: 4000, animation: true }); // 3–5s tuỳ chỉnh
+            toast.show();
+        });
+    </script>
+}

@@ -1,0 +1,122 @@
+﻿@inject _1.Data.AppDbContext _context
+@{
+    var categories = _context.Categories.Where(c => c.Active).ToList();
+}
+
+<div class="card category-card shadow-lg border-0 rounded-3 mb-4">
+    <div class="card-header bg-custom-primary text-white py-3 rounded-top-3">
+        <h5 class="card-title mb-0 text-white">
+            <i class="bi bi-tags-fill me-2"></i>
+            Danh mục sản phẩm
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        @{
+            var path = Context.Request.Path.ToString().ToLower();
+            bool isAdminPage = path.StartsWith("/admin");
+        }
+        <ul class="list-group list-group-flush category-list">
+            @foreach (var cat in categories)
+            {
+                
+                <li class="list-group-item">
+                    <a href="/Products/ByCategory/@cat.Id">@cat.Name</a>
+                </li>
+              
+            }
+            @if (!categories.Any())
+            {
+                <li class="list-group-item text-center text-muted py-3">
+                    Không có danh mục nào.
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+
+<style>
+    /* Custom Primary Color Variables */
+    :root {
+        --custom-primary: #212529;
+        --custom-primary-hover: #1a1e21;
+        --custom-primary-light: rgba(33, 37, 41, 0.1);
+        --custom-primary-shadow: rgba(33, 37, 41, 0.15);
+        --gradient-primary: linear-gradient(135deg, #212529 0%, #343a40 100%);
+    }
+
+    /* Custom Primary Color Classes */
+    .text-custom-primary {
+        color: var(--custom-primary) !important;
+    }
+
+    .bg-custom-primary {
+        background-color: var(--custom-primary) !important;
+    }
+
+    .btn-custom-primary {
+        background: var(--gradient-primary);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        box-shadow: 0 4px 12px var(--custom-primary-shadow);
+    }
+
+        .btn-custom-primary:hover {
+            background: linear-gradient(135deg, var(--custom-primary-hover) 0%, #16191d 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px var(--custom-primary-shadow);
+            color: white;
+        }
+
+    /* Category Card Styling */
+    .category-card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+        .category-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+        }
+
+        .category-card .card-header {
+            background: var(--gradient-primary) !important;
+            border-bottom: none;
+        }
+
+    /* Category List Items */
+    .category-list-item {
+        border-left: 4px solid transparent;
+        transition: all 0.3s ease;
+        padding: 0.75rem 1.25rem;
+    }
+
+        .category-list-item:hover {
+            background-color: var(--custom-primary-light);
+            border-left-color: var(--custom-primary);
+        }
+
+    .category-link {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: var(--custom-primary);
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .category-list-item:hover .category-link {
+        color: var(--custom-primary-hover);
+        transform: translateX(3px);
+    }
+
+    .category-icon {
+        color: #6c757d; /* Default icon color */
+        transition: all 0.3s ease;
+    }
+
+    .category-list-item:hover .category-icon {
+        color: var(--custom-primary); /* Icon color on hover */
+    }
+</style>

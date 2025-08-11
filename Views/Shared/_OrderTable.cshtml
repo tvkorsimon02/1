@@ -1,0 +1,67 @@
+﻿@model List<Order>
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    var username = HttpContextAccessor.HttpContext?.Session.GetString("username");
+    bool isAdmin = username == "admin"; // kiểm tra admin gán cứng
+}
+<table class="table table-bordered table-hover shadow-sm">
+    <thead class="table-light">
+        <tr>
+            <th>Mã đơn</th>
+            <th>Khách hàng</th>
+            <th>Ngày tạo</th>
+            <th>Trạng thái</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="5" class="text-center text-muted">Không có đơn hàng</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var order in Model)
+            {
+                <tr>
+                    <td>@order.Id</td>
+                    <td>@order.Username</td>
+                    <td>@order.Created_Date.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        @{
+                            string statusText = order.Status switch
+                            {
+                                1 => "Chưa duyệt",
+                                2 => "Đã duyệt",
+                                3 => "Đang giao",
+                                4 => "Đã giao",
+                                5 => "Đã nhận",
+                                6 => "Đã huỷ",
+                                _ => "Chưa duyệt"
+                            };
+                        }
+                        <span>@statusText</span>
+                    </td>
+                    <td>
+                        @if (isAdmin)
+                        {
+                            <a href="/Admin/OrderDetails/@order.Id" class="btn btn-sm btn-warning">
+                                <i class="bi bi-pencil-square"></i> Quản lý
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="/Orders/Details/@order.Id" class="btn btn-sm btn-info">
+                                <i class="bi bi-eye"></i> Xem
+                            </a>
+                        }
+
+
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

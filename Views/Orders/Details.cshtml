@@ -1,0 +1,474 @@
+﻿@model Order
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng";
+    Layout = "~/Views/Shared/_Layout_NoSidebar.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex align-items-center justify-content-between flex-wrap">
+                <div class="d-flex align-items-center mb-3 mb-sm-0">
+                    <div class="bg-custom-primary bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3"
+                         style="width: 60px; height: 60px;">
+                        <i class="bi bi-receipt-cutoff text-white" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <div>
+                        <h2 class="fw-bold text-custom-primary mb-1">Chi tiết đơn hàng</h2>
+                        <p class="text-muted mb-0">Mã đơn hàng: <span class="fw-semibold">#@Model.Id</span></p>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <a href="/Orders/MyOrders" class="btn btn-outline-custom-primary">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Quay lại danh sách
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Information Card -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-custom-primary text-white py-3">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Thông tin đơn hàng
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="info-item">
+                                <label class="info-label">
+                                    <i class="bi bi-hash text-custom-primary me-2"></i>
+                                    Mã đơn hàng
+                                </label>
+                                <div class="info-value">#@Model.Id</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="info-item">
+                                <label class="info-label">
+                                    <i class="bi bi-calendar3 text-custom-primary me-2"></i>
+                                    Ngày tạo
+                                </label>
+                                <div class="info-value">@Model.Created_Date.ToString("dd/MM/yyyy")</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="info-item">
+                                <label class="info-label">
+                                    <i class="bi bi-flag text-custom-primary me-2"></i>
+                                    Trạng thái
+                                </label>
+                                <div class="info-value">
+                                    @{
+                                        string statusText = Model.Status switch
+                                        {
+                                            1 => "Chưa duyệt",
+                                            2 => "Đã duyệt",
+                                            3 => "Đang giao",
+                                            4 => "Đã giao",
+                                            5 => "Đã nhận",
+                                            6 => "Đã huỷ",
+                                            _ => "Chưa duyệt"
+                                        };
+                                        string statusClass = Model.Status switch
+                                        {
+                                            1 => "bg-warning text-dark",
+                                            2 => "bg-info text-white",
+                                            3 => "bg-primary text-white",
+                                            4 => "bg-success text-white",
+                                            5 => "bg-success text-white",
+                                            6 => "bg-danger text-white",
+                                            _ => "bg-warning text-dark"
+                                        };
+                                        string statusIcon = Model.Status switch
+                                        {
+                                            1 => "bi-clock-history",
+                                            2 => "bi-check-circle",
+                                            3 => "bi-truck",
+                                            4 => "bi-box-seam",
+                                            5 => "bi-hand-thumbs-up",
+                                            6 => "bi-x-circle",
+                                            _ => "bi-clock-history"
+                                        };
+                                    }
+                                    <span class="badge @statusClass fs-6 px-3 py-2">
+                                        <i class="@statusIcon me-1"></i>
+                                        @statusText
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light border-0 py-3">
+                    <h5 class="card-title mb-0 text-custom-primary">
+                        <i class="bi bi-box-seam me-2"></i>
+                        Sản phẩm trong đơn hàng
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="border-0 py-3 ps-4">
+                                        <i class="bi bi-box me-2 text-custom-primary"></i>
+                                        Sản phẩm
+                                    </th>
+                                    <th class="border-0 py-3 text-center">
+                                        <i class="bi bi-image me-2 text-custom-primary"></i>
+                                        Hình ảnh
+                                    </th>
+                                    <th class="border-0 py-3 text-center">
+                                        <i class="bi bi-123 me-2 text-custom-primary"></i>
+                                        Số lượng
+                                    </th>
+                                    <th class="border-0 py-3 text-end">
+                                        <i class="bi bi-currency-dollar me-2 text-custom-primary"></i>
+                                        Giá
+                                    </th>
+                                    <th class="border-0 py-3 text-end pe-4">
+                                        <i class="bi bi-calculator me-2 text-custom-primary"></i>
+                                        Thành tiền
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var d in Model.OrderDetails)
+                                {
+                                    <tr class="product-row">
+                                        <td class="ps-4 py-3">
+                                            <div class="product-name">
+                                                @d.ProductNav?.Name
+                                            </div>
+                                        </td>
+                                        <td class="text-center py-3">
+                                            <div class="product-image-container">
+                                                @if (!string.IsNullOrEmpty(d.ProductNav?.ImageUrl))
+                                                {
+                                                    <img src="@Url.Content($"~/uploads/{d.ProductNav?.ImageUrl}")" asp-append-version="true"
+                                                         class="product-image rounded shadow-sm"
+                                                         alt="@d.ProductNav?.Name" />
+                                                }
+                                                else
+                                                {
+                                                    <div class="product-image-placeholder rounded shadow-sm d-flex align-items-center justify-content-center">
+                                                        <i class="bi bi-image text-muted"></i>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </td>
+                                        <td class="text-center py-3 align-middle">
+                                            <span class="quantity-badge">@d.Quantity</span>
+                                        </td>
+                                        <td class="text-end py-3 align-middle">
+                                            <span class="price-text">@string.Format("{0:N0}", d.Price) VNĐ</span>
+                                        </td>
+                                        <td class="text-end pe-4 py-3 align-middle">
+                                            <span class="total-price">@string.Format("{0:N0}", d.Price * d.Quantity) VNĐ</span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0 bg-light">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-receipt text-custom-primary me-3" style="font-size: 1.5rem;"></i>
+                                <div>
+                                    <h6 class="mb-1 text-custom-primary">Tổng giá trị đơn hàng</h6>
+                                    <small class="text-muted">Bao gồm tất cả sản phẩm trong đơn hàng</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="total-amount">
+                                @string.Format("{0:N0}", Model.OrderDetails.Sum(x => x.Price * x.Quantity)) VNĐ
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                @if (Model.Status == 1)
+                {
+                    <form asp-action="CancelOrder" method="post" class="me-2 mb-2 mb-sm-0">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <button type="submit" class="btn btn-danger btn-lg"
+                                onclick="return confirm('Bạn có chắc muốn hủy đơn hàng này không?');">
+                            <i class="bi bi-x-circle me-2"></i> Hủy đơn hàng
+                        </button>
+                    </form>
+                }
+                <div class="action-buttons d-flex flex-wrap justify-content-end">
+                    <button class="btn btn-custom-primary btn-lg me-2 mb-2 mb-sm-0" onclick="window.print()">
+                        <i class="bi bi-printer me-2"></i>
+                        In đơn hàng
+                    </button>
+                    <button class="btn btn-outline-custom-primary btn-lg mb-2 mb-sm-0" onclick="downloadOrderDetails()">
+                        <i class="bi bi-download me-2"></i>
+                        Tải xuống
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom Primary Color Variables */
+    :root {
+        --custom-primary: #212529;
+        --custom-primary-hover: #1a1e21;
+        --custom-primary-light: rgba(33, 37, 41, 0.1);
+        --custom-primary-shadow: rgba(33, 37, 41, 0.15);
+        --gradient-primary: linear-gradient(135deg, #212529 0%, #343a40 100%);
+    }
+
+    /* Custom Primary Color Classes */
+    .text-custom-primary {
+        color: var(--custom-primary) !important;
+    }
+
+    .bg-custom-primary {
+        background-color: var(--custom-primary) !important;
+    }
+
+    .btn-custom-primary {
+        background: var(--gradient-primary);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+        .btn-custom-primary:hover {
+            background: linear-gradient(135deg, var(--custom-primary-hover) 0%, #16191d 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--custom-primary-shadow);
+            color: white;
+        }
+
+    .btn-outline-custom-primary {
+        border: 2px solid var(--custom-primary);
+        color: var(--custom-primary);
+        background: transparent;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+        .btn-outline-custom-primary:hover {
+            background: var(--custom-primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--custom-primary-shadow);
+        }
+
+    /* Header Styling */
+    .bg-gradient {
+        background: var(--gradient-primary) !important;
+    }
+
+    /* Card Styling */
+    .card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+        }
+
+    .card-header.bg-custom-primary {
+        background: var(--gradient-primary) !important;
+        border-bottom: none;
+    }
+
+    /* Info Items */
+    .info-item {
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 0.5rem;
+        border-left: 4px solid var(--custom-primary);
+        transition: all 0.3s ease;
+    }
+
+        .info-item:hover {
+            background: var(--custom-primary-light);
+            transform: translateX(5px);
+        }
+
+    .info-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .info-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--custom-primary);
+    }
+
+    /* Table Styling */
+    .table {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+        .table thead th {
+            background: #f8f9fa;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--custom-primary);
+            border-bottom: 2px solid var(--custom-primary-light);
+        }
+
+    .product-row {
+        transition: all 0.3s ease;
+    }
+
+        .product-row:hover {
+            background-color: var(--custom-primary-light);
+            transform: scale(1.01);
+        }
+
+    /* Product Image */
+    .product-image-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .product-image {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+        .product-image:hover {
+            transform: scale(1.1);
+            border-color: var(--custom-primary);
+        }
+
+    .product-image-placeholder {
+        width: 60px;
+        height: 60px;
+        background: #e9ecef;
+        border: 2px solid #dee2e6;
+    }
+
+    /* Product Name */
+    .product-name {
+        font-weight: 600;
+        color: var(--custom-primary);
+        font-size: 0.95rem;
+    }
+
+    /* Quantity Badge */
+    .quantity-badge {
+        background: var(--custom-primary);
+        color: white;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    /* Price Text */
+    .price-text {
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+
+    .total-price {
+        font-weight: 700;
+        color: var(--custom-primary);
+        font-size: 1rem;
+    }
+
+    /* Total Amount */
+    .total-amount {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--custom-primary);
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    /* Status Badge */
+    .badge.fs-6 {
+        font-size: 0.9rem !important;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+
+</style>
+
+@section Scripts {
+    <script>
+        function downloadOrderDetails() {
+            // Implement download functionality
+            alert('Tính năng tải xuống sẽ được triển khai sau!');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects to product rows
+            const productRows = document.querySelectorAll('.product-row');
+            productRows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.boxShadow = '0 4px 15px rgba(33, 37, 41, 0.1)';
+                });
+
+                row.addEventListener('mouseleave', function() {
+                    this.style.boxShadow = 'none';
+                });
+            });
+        });
+    </script>
+}
