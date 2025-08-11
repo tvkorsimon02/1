@@ -1,0 +1,237 @@
+﻿@model List<Product>
+@{
+    Layout = "~/Views/Shared/_Layout_NoSidebar.cshtml";
+    var categories = ViewBag.Categories as List<Category>;
+    var query = ViewBag.Query as string;
+    int? categoryId = ViewBag.CategoryId as int?;
+    long? min = ViewBag.Min as long?;
+    long? max = ViewBag.Max as long?;
+    string sort = ViewBag.Sort as string ?? "";
+    int page = (int)ViewBag.Page;
+    int pageSize = (int)ViewBag.PageSize;
+    int total = (int)ViewBag.Total;
+    int totalPages = (int)Math.Ceiling((double)Math.Max(total, 1) / pageSize);
+}
+
+<div class="container py-4">
+    <h3 class="mb-3">Kết quả tìm kiếm</h3>
+
+    <form method="get" class="row g-3 align-items-end mb-4">
+        <div class="col-sm-12 col-md-4">
+            <label class="form-label">Từ khoá</label>
+            <input type="search" name="query" value="@query" class="form-control" placeholder="Tên sản phẩm..." id="searchBox" />
+        </div>
+        <div class="col-sm-6 col-md-2">
+            <label class="form-label">Danh mục</label>
+            <select name="categoryId" class="form-select">
+                <option value="">Tất cả</option>
+                @foreach (var c in categories!)
+                {
+                    <option value="@c.Id" selected="@(categoryId == c.Id)">
+                        @c.Name
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label">Giá từ</label>
+            <input type="number" name="min" value="@(min?.ToString())" class="form-control" min="0" step="1000" />
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label">đến</label>
+            <input type="number" name="max" value="@(max?.ToString())" class="form-control" min="0" step="1000" />
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label">Sắp xếp</label>
+            <select name="sort" class="form-select">
+                <option value="">Mới nhất</option>
+                <option value="price_asc" selected="@(sort=="price_asc")">Giá tăng dần</option>
+                <option value="price_desc" selected="@(sort=="price_desc")">Giá giảm dần</option>
+                <option value="name_asc" selected="@(sort=="name_asc")">Tên A→Z</option>
+                <option value="name_desc" selected="@(sort=="name_desc")">Tên Z→A</option>
+            </select>
+        </div>
+        <div class="col-12 d-flex gap-2">
+            <button class="btn btn-dark"><i class="bi bi-search me-1"></i> Tìm</button>
+            <a href="/Search" class="btn btn-outline-secondary">Xoá lọc</a>
+        </div>
+    </form>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning">Không tìm thấy sản phẩm phù hợp.</div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var p in Model)
+            {
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card product-card h-100 shadow-sm">
+                        <!-- Khung ảnh cố định tỉ lệ 4:3, ảnh không bị méo/cắt -->
+                        <div class="ratio ratio-4x3 product-thumb">
+                            <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/placeholder.svg?height=300&width=400" : Url.Content("~/uploads/" + p.ImageUrl))"
+                                 alt="@p.Name"
+                                 class="img-fluid product-img" />
+                        </div>
+
+                        <div class="card-body d-flex flex-column">
+                            <h6 class="product-title mb-2" title="@p.Name">@p.Name</h6>
+                            <div class="mb-2 text-muted small">@p.CategoryNav?.Name</div>
+                            <div class="fw-bold text-primary mb-3">@string.Format("{0:N0}", p.Price) VNĐ</div>
+
+                            <div class="mt-auto d-flex gap-2">
+                                <a href="/Home/Details/@p.Id" class="btn btn-outline-dark btn-sm">
+                                    <i class="bi bi-eye me-1"></i> Xem
+                                </a>
+                                <a href="/Cart/Add/@p.Id" class="btn btn-dark btn-sm">
+                                    <i class="bi bi-cart-plus me-1"></i> Thêm
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            }
+        </div>
+
+        <!-- Phân trang -->
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center custom-pagination">
+                <li class="page-item @(page<=1 ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("Index", new { query, categoryId, min, max, sort, page = page - 1 })">
+                        <i class="bi bi-arrow-left"></i> Trước
+                    </a>
+                </li>
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i==page ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Index", new { query, categoryId, min, max, sort, page = i })">@i</a>
+                    </li>
+                }
+                <li class="page-item @(page>=totalPages ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("Index", new { query, categoryId, min, max, sort, page = page + 1 })">
+                        Sau <i class="bi bi-arrow-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Gợi ý nhanh (optional)
+        const box = document.getElementById('searchBox');
+        let timer = null, menu;
+
+        box?.addEventListener('input', function () {
+            clearTimeout(timer);
+            const term = this.value.trim();
+            if (term.length < 2) { if (menu) menu.remove(); return; }
+
+            timer = setTimeout(async () => {
+                const res = await fetch(`/Search/Suggest?term=${encodeURIComponent(term)}`);
+                const data = await res.json();
+
+                if (menu) menu.remove();
+                menu = document.createElement('div');
+                menu.className = 'list-group position-absolute w-100';
+                menu.style.zIndex = 1050;
+
+                if (data.length === 0) {
+                    const it = document.createElement('div');
+                    it.className = 'list-group-item small text-muted';
+                    it.textContent = 'Không có gợi ý';
+                    menu.appendChild(it);
+                } else {
+                    data.forEach(x => {
+                        const a = document.createElement('a');
+                        a.className = 'list-group-item list-group-item-action';
+                        a.href = `/Home/Details/${x.id}`;
+                        a.textContent = x.name;
+                        menu.appendChild(a);
+                    });
+                }
+
+                // đặt menu ngay dưới ô search
+                const wrapper = box.parentElement;
+                wrapper.style.position = 'relative';
+                wrapper.appendChild(menu);
+            }, 200);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (menu && !menu.contains(e.target) && e.target !== box) {
+                menu.remove();
+            }
+        });
+    </script>
+}
+
+<style>
+    /* Pagination Custom */
+    .custom-pagination .page-link {
+        color: white;
+        background: linear-gradient(135deg, #212529 0%, #343a40 100%);
+        border: none;
+        margin: 0 3px;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+        .custom-pagination .page-link:hover {
+            background: linear-gradient(135deg, #1a1e21 0%, #495057 100%);
+            transform: translateY(-1px);
+            color: white;
+        }
+
+    .custom-pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, #000 0%, #212529 100%);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .custom-pagination .page-item.disabled .page-link {
+        background: #adb5bd;
+        cursor: not-allowed;
+        color: #f8f9fa;
+        box-shadow: none;
+    }
+    /* Card ảnh cố định, không méo, đồng đều chiều cao */
+    .product-card {
+        border: 1px solid rgba(0,0,0,0.06);
+        border-radius: 0.75rem;
+    }
+
+    .product-thumb {
+        background: #fff;
+    }
+    /* nền trắng cho ảnh */
+    .product-img {
+        object-fit: contain;
+    }
+    /* không cắt ảnh */
+    .product-card .card-body {
+        padding: 1rem;
+    }
+
+    /* Tiêu đề 2 dòng, tự cắt dấu “…” để không đẩy cao card */
+    .product-title {
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* 2 dòng */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        min-height: 2.6em; /* giữ chiều cao ổn định */
+        line-height: 1.3;
+    }
+
+    /* Đồng bộ hover nhẹ nhàng */
+    .product-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 22px rgba(0,0,0,0.1);
+        transition: .2s ease;
+    }
+
+</style>
+

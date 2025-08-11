@@ -51,27 +51,35 @@ namespace _1.Controllers
         public IActionResult Register() => View();
 
         [HttpPost]
-        public IActionResult Register(string Username, string UsernameConfirm, string Password, string FullName, string Gender, DateTime BirthDate)
+        public IActionResult Register(
+    string Username,
+    string Password,
+    string PasswordConfirm,
+    string FullName,
+    string Gender,
+    DateTime BirthDate)
         {
-            if (Username != UsernameConfirm)
-            {
-                TempData["Message"] = "Tên tài khoản nhập lại không khớp!";
-                return View();
-            }
-
-            // Kiểm tra trùng username
+            // 1) Kiểm tra trùng username
             if (_context.Customers.Any(c => c.Username == Username))
             {
                 TempData["Message"] = "Tên tài khoản đã tồn tại!";
                 return View();
             }
 
+            // 2) Xác nhận mật khẩu
+            if (Password != PasswordConfirm)
+            {
+                TempData["Message"] = "Mật khẩu nhập lại không khớp!";
+                return View();
+            }
+
+            // 3) Tạo khách hàng
             var customer = new Customer
             {
                 Username = Username,
-                Password = Password, // Hash password nếu cần
+                Password = Password, // TODO: Hash password nếu cần
                 FullName = FullName,
-                Gender = Gender,
+                Gender = Gender,     // "Nam" / "Nữ" / "Khác"
                 BirthDate = BirthDate,
                 Active = true
             };
@@ -82,6 +90,7 @@ namespace _1.Controllers
             TempData["Message"] = "Đăng ký thành công, vui lòng đăng nhập!";
             return RedirectToAction("Login");
         }
+
 
 
         public IActionResult Logout()
