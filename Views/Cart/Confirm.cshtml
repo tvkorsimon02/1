@@ -69,6 +69,19 @@
                                     <th class="text-end" style="width: 150px;">Thành tiền</th>
                                 </tr>
                             </thead>
+                            <div class="card mb-3">
+                                <div class="card-header">Thông tin giao hàng</div>
+                                <div class="card-body">
+                                    <div><strong>Người nhận:</strong> @Model.ReceiverName</div>
+                                    <div><strong>Số điện thoại:</strong> @Model.ReceiverPhone</div>
+                                    <div><strong>Địa chỉ:</strong> @Model.ShippingAddress</div>
+                                    @if (!string.IsNullOrWhiteSpace(Model.Note))
+                                    {
+                                        <div><strong>Ghi chú:</strong> @Model.Note</div>
+                                    }
+                                </div>
+                            </div>
+
                             <tbody>
                                 @if (Model.OrderDetails != null && Model.OrderDetails.Any())
                                 {

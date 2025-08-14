@@ -2,9 +2,10 @@
 @{
     ViewData["Title"] = "Danh sách sản phẩm";
     Layout = "~/Views/Shared/_Layout_NoSidebar.cshtml";
+    var currentSort = ViewBag.Sort as string ?? "status_desc";
+    var nextSort = currentSort == "status_desc" ? "status_asc" : "status_desc";
 }
 
-<!-- Toast Notification -->
 @if (TempData["Message"] != null)
 {
     <div id="toastMessage" class="toast-container position-fixed bottom-0 start-0 p-3" style="z-index: 1055;">
@@ -14,21 +15,18 @@
                     <i class="bi bi-exclamation-triangle-fill me-2"></i>
                     @TempData["Message"]
                 </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto"
-                        data-bs-dismiss="toast" aria-label="Đóng"></button>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Đóng"></button>
             </div>
         </div>
     </div>
 }
 
 <div class="container-fluid py-4">
-    <!-- Header Section -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="d-flex align-items-center justify-content-between flex-wrap">
                 <div class="d-flex align-items-center mb-3 mb-sm-0">
-                    <div class="bg-custom-primary bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3"
-                         style="width: 60px; height: 60px;">
+                    <div class="bg-custom-primary bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
                         <i class="bi bi-box-seam text-white" style="font-size: 1.5rem;"></i>
                     </div>
                     <div>
@@ -38,20 +36,17 @@
                 </div>
                 <div class="text-end">
                     <a class="btn btn-custom-primary btn-lg" href="/Admin/EditProduct/0">
-                        <i class="bi bi-plus-circle me-2"></i>
-                        Thêm sản phẩm mới
+                        <i class="bi bi-plus-circle me-2"></i> Thêm sản phẩm mới
                     </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Product List Table Card -->
     <div class="card shadow-sm border-0">
         <div class="card-header bg-light border-0 py-3">
             <h5 class="card-title mb-0 text-custom-primary">
-                <i class="bi bi-grid-3x3-gap-fill me-2"></i>
-                Sản phẩm hiện có
+                <i class="bi bi-grid-3x3-gap-fill me-2"></i> Sản phẩm hiện có
             </h5>
         </div>
         <div class="card-body p-0">
@@ -61,91 +56,106 @@
                         <tr>
                             <th class="border-0 py-3 ps-4" style="width:5%;">#</th>
                             <th class="border-0 py-3 text-center" style="width:10%;">
-                                <i class="bi bi-image me-2 text-custom-primary"></i>
-                                Ảnh
+                                <i class="bi bi-image me-2 text-custom-primary"></i> Ảnh
                             </th>
                             <th class="border-0 py-3" style="width:25%;">
-                                <i class="bi bi-tag me-2 text-custom-primary"></i>
-                                Tên sản phẩm
+                                <i class="bi bi-tag me-2 text-custom-primary"></i> Tên sản phẩm
                             </th>
                             <th class="border-0 py-3 text-end" style="width:15%;">
-                                <i class="bi bi-currency-dollar me-2 text-custom-primary"></i>
-                                Giá
+                                <i class="bi bi-currency-dollar me-2 text-custom-primary"></i> Giá
                             </th>
                             <th class="border-0 py-3 text-center" style="width:10%;">
-                                <i class="bi bi-123 me-2 text-custom-primary"></i>
-                                Số lượng
+                                <i class="bi bi-123 me-2 text-custom-primary"></i> Số lượng
                             </th>
                             <th class="border-0 py-3" style="width:15%;">
-                                <i class="bi bi-folder me-2 text-custom-primary"></i>
-                                Danh mục
+                                <i class="bi bi-folder me-2 text-custom-primary"></i> Danh mục
                             </th>
                             <th class="border-0 py-3 text-center" style="width:10%;">
-                                <i class="bi bi-check-circle me-2 text-custom-primary"></i>
-                                Trạng thái
+                                <a href="@Url.Action("Product","Admin", new { sort = nextSort })" class="text-decoration-none">
+                                    <i class="bi bi-check-circle me-2 text-custom-primary"></i>
+                                    Trạng thái
+                                    @if (currentSort == "status_desc")
+                                    {
+                                        <i class="bi bi-sort-down-alt ms-1"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-sort-up-alt ms-1"></i>
+                                    }
+                                </a>
                             </th>
                             <th class="border-0 py-3 text-center pe-4" style="width:10%;">
-                                <i class="bi bi-gear me-2 text-custom-primary"></i>
-                                Hành động
+                                <i class="bi bi-gear me-2 text-custom-primary"></i> Hành động
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var p in Model)
+                        @if (Model.Any())
                         {
-                            <tr class="product-row">
-                                <td class="ps-4 py-3 align-middle">@p.Id</td>
-                                <td class="py-3 text-center align-middle">
-                                    <div class="product-image-container">
-                                        @if (!string.IsNullOrEmpty(p.ImageUrl))
+                            foreach (var p in Model)
+                            {
+                                var locked = p.CategoryNav != null && !p.CategoryNav.Active; // danh mục đang ẩn?
+                                <tr class="product-row @(locked ? "opacity-60" : "")">
+                                    <td class="ps-4 py-3 align-middle">@p.Id</td>
+                                    <td class="py-3 text-center align-middle">
+                                        <div class="product-image-container">
+                                            @if (!string.IsNullOrEmpty(p.ImageUrl))
+                                            {
+                                                <img src="~/uploads/@p.ImageUrl" alt="@p.Name" class="product-image rounded shadow-sm" />
+                                            }
+                                            else
+                                            {
+                                                <div class="product-image-placeholder rounded shadow-sm d-flex align-items-center justify-content-center">
+                                                    <i class="bi bi-image text-muted"></i>
+                                                </div>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td class="py-3 align-middle">
+                                        <span class="product-name">@p.Name</span>
+                                        @if (locked)
                                         {
-                                            <img src="~/uploads/@p.ImageUrl" alt="@p.Name"
-                                                 class="product-image rounded shadow-sm" />
-                                        }
-                                        else
-                                        {
-                                            <div class="product-image-placeholder rounded shadow-sm d-flex align-items-center justify-content-center">
-                                                <i class="bi bi-image text-muted"></i>
+                                            <div class="small mt-1">
+                                                <span class="badge bg-secondary-subtle text-secondary border" title="Danh mục đang ẩn">Danh mục ẩn</span>
                                             </div>
                                         }
-                                    </div>
-                                </td>
-                                <td class="py-3 align-middle">
-                                    <span class="product-name">@p.Name</span>
-                                </td>
-                                <td class="py-3 text-end align-middle">
-                                    <span class="price-text">@string.Format("{0:N0} VNĐ", p.Price)</span>
-                                </td>
-                                <td class="py-3 text-center align-middle">
-                                    <span class="quantity-badge">@p.Quantity</span>
-                                </td>
-                                <td class="py-3 align-middle">
-                                    <span class="category-name-text">@p.CategoryNav?.Name</span>
-                                </td>
-                                <td class="py-3 text-center align-middle">
-                                    <form method="post" asp-action="ToggleProductActive" asp-controller="Admin" asp-route-id="@p.Id" style="display:inline;">
-                                        <button type="submit" class="btn btn-sm status-toggle-btn @(p.Active ? "btn-success" : "btn-secondary")">
-                                            @(p.Active ? "Đang hiện" : "Đang ẩn")
-                                        </button>
-                                        @Html.AntiForgeryToken()
-                                    </form>
-                                </td>
-                                <td class="py-3 text-center align-middle">
-                                    <a href="/Admin/EditProduct/@p.Id" class="btn btn-sm btn-warning-custom me-2">
-                                        <i class="bi bi-pencil-square me-1"></i> Sửa
-                                    </a>
-                                    <a href="/Admin/DeleteProduct/@p.Id" class="btn btn-sm btn-danger-custom" onclick="return confirm('Bạn chắc chắn muốn xoá sản phẩm này?');">
-                                        <i class="bi bi-trash me-1"></i> Xoá
-                                    </a>
-                                </td>
-                            </tr>
+                                    </td>
+                                    <td class="py-3 text-end align-middle">
+                                        <span class="price-text">@string.Format("{0:N0} VNĐ", p.Price)</span>
+                                    </td>
+                                    <td class="py-3 text-center align-middle">
+                                        <span class="quantity-badge">@p.Quantity</span>
+                                    </td>
+                                    <td class="py-3 align-middle">
+                                        <span class="category-name-text">@p.CategoryNav?.Name</span>
+                                    </td>
+                                    <td class="py-3 text-center align-middle">
+                                        <form method="post" asp-action="ToggleProductActive" asp-controller="Admin" asp-route-id="@p.Id" style="display:inline;">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit"
+                                                    class="btn btn-sm status-toggle-btn @(p.Active ? "btn-success" : "btn-secondary")"
+                                            @(locked ? "disabled" : "")
+                                                    title="@(locked ? "Danh mục đang ẩn - không thể thao tác" : (p.Active ? "Đang hiện" : "Đang ẩn"))">
+                                                @(p.Active ? "Đang hiện" : "Đang ẩn")
+                                            </button>
+                                        </form>
+                                    </td>
+                                    <td class="py-3 text-center align-middle">
+                                        <a href="/Admin/EditProduct/@p.Id"
+                                           class="btn btn-sm btn-warning-custom @(locked ? "disabled" : "")"
+                                        @(locked ? "aria-disabled=\"true\" tabindex=\"-1\"" : "")
+                                           title="@(locked ? "Danh mục đang ẩn - không thể sửa" : "Sửa")">
+                                            <i class="bi bi-pencil-square me-1"></i> Sửa
+                                        </a>
+                                        @* ĐÃ BỎ nút XÓA *@
+                                    </td>
+                                </tr>
+                            }
                         }
-                        @if (!Model.Any())
+                        else
                         {
                             <tr>
-                                <td colspan="8" class="text-center py-4 text-muted">
-                                    Không có sản phẩm nào được tìm thấy.
-                                </td>
+                                <td colspan="8" class="text-center py-4 text-muted">Không có sản phẩm nào được tìm thấy.</td>
                             </tr>
                         }
                     </tbody>
@@ -156,7 +166,6 @@
 </div>
 
 <style>
-    /* Custom Primary Color Variables */
     :root {
         --custom-primary: #212529;
         --custom-primary-hover: #1a1e21;
@@ -165,7 +174,6 @@
         --gradient-primary: linear-gradient(135deg, #212529 0%, #343a40 100%);
     }
 
-    /* Custom Primary Color Classes */
     .text-custom-primary {
         color: var(--custom-primary) !important;
     }
@@ -190,33 +198,26 @@
             color: white;
         }
 
-    /* Card Styling */
     .card {
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        transition: transform .2s, box-shadow .2s;
         border: 1px solid rgba(0,0,0,0.05);
     }
 
         .card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+            box-shadow: 0 8px 25px rgba(0,0,0,.1) !important;
         }
 
-    /* Table Styling */
-    .table {
-        border-collapse: separate;
-        border-spacing: 0;
+    .table thead th {
+        background: #f8f9fa;
+        font-weight: 600;
+        font-size: .9rem;
+        color: var(--custom-primary);
+        border-bottom: 2px solid var(--custom-primary-light);
     }
 
-        .table thead th {
-            background: #f8f9fa;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--custom-primary);
-            border-bottom: 2px solid var(--custom-primary-light);
-        }
-
     .product-row {
-        transition: all 0.3s ease;
+        transition: all .3s ease;
     }
 
         .product-row:hover {
@@ -224,19 +225,16 @@
             transform: scale(1.005);
         }
 
-    /* Product Image */
-    .product-image-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
+    .opacity-60 {
+        opacity: .6;
     }
 
     .product-image {
         width: 80px;
         height: 80px;
-        object-fit: contain; /* Keep original object-fit */
+        object-fit: contain;
         border: 2px solid #e9ecef;
-        transition: all 0.3s ease;
+        transition: all .3s;
     }
 
         .product-image:hover {
@@ -252,75 +250,59 @@
         font-size: 1.5rem;
     }
 
-    /* Product Name */
     .product-name {
         font-weight: 600;
         color: var(--custom-primary);
-        font-size: 0.95rem;
+        font-size: .95rem;
     }
 
-    /* Price Text */
     .price-text {
         font-weight: 600;
         color: #6c757d;
-        font-size: 0.95rem;
+        font-size: .95rem;
     }
 
-    /* Quantity Badge */
     .quantity-badge {
         background: var(--custom-primary);
         color: white;
-        padding: 0.375rem 0.75rem;
-        border-radius: 0.5rem;
+        padding: .375rem .75rem;
+        border-radius: .5rem;
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: .9rem;
     }
 
-    /* Category Name Text */
     .category-name-text {
         font-weight: 500;
         color: #495057;
-        font-size: 0.9rem;
+        font-size: .9rem;
     }
 
-    /* Status Toggle Button */
     .status-toggle-btn {
         font-weight: 600;
-        border-radius: 0.5rem;
-        padding: 0.375rem 0.75rem;
-        transition: all 0.3s ease;
+        border-radius: .5rem;
+        padding: .375rem .75rem;
+        transition: all .3s;
     }
 
-        .status-toggle-btn.btn-success {
-            background-color: #28a745;
-            border-color: #28a745;
+        .status-toggle-btn.btn-success:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+            transform: translateY(-1px);
         }
 
-            .status-toggle-btn.btn-success:hover {
-                background-color: #218838;
-                border-color: #1e7e34;
-                transform: translateY(-1px);
-            }
-
-        .status-toggle-btn.btn-secondary {
-            background-color: #6c757d;
-            border-color: #6c757d;
+        .status-toggle-btn.btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+            transform: translateY(-1px);
         }
 
-            .status-toggle-btn.btn-secondary:hover {
-                background-color: #5a6268;
-                border-color: #545b62;
-                transform: translateY(-1px);
-            }
-
-    /* Action Buttons (Edit/Delete) */
     .btn-warning-custom {
         background-color: #ffc107;
         border-color: #ffc107;
-        color: #212529; /* Dark text for warning */
+        color: #212529;
         font-weight: 500;
-        border-radius: 0.5rem;
-        transition: all 0.3s ease;
+        border-radius: .5rem;
+        transition: all .3s;
     }
 
         .btn-warning-custom:hover {
@@ -330,23 +312,6 @@
             color: #212529;
         }
 
-    .btn-danger-custom {
-        background-color: #dc3545;
-        border-color: #dc3545;
-        color: white;
-        font-weight: 500;
-        border-radius: 0.5rem;
-        transition: all 0.3s ease;
-    }
-
-        .btn-danger-custom:hover {
-            background-color: #c82333;
-            border-color: #bd2130;
-            transform: translateY(-1px);
-            color: white;
-        }
-
-    /* Toast Styling */
     .toast.bg-custom-primary {
         background: var(--gradient-primary) !important;
         border-radius: 10px;
@@ -357,10 +322,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const toastEl = document.querySelector('.toast');
-            if (toastEl) {
-                const toast = new bootstrap.Toast(toastEl, { delay: 5000 });
-                toast.show();
-            }
+            if (toastEl) new bootstrap.Toast(toastEl, { delay: 5000 }).show();
         });
     </script>
 }

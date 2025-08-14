@@ -1,7 +1,10 @@
 ﻿@model List<Cart>
 @{
     Layout = "~/Views/Shared/_Layout_NoSidebar.cshtml";
-    decimal subtotal = Model.Sum(item => item.Quantity * (item.ProductNav?.Price ?? 0));
+    // CHỈ tính tổng cho sản phẩm còn Active
+    decimal subtotal = Model
+        .Where(item => item.ProductNav?.Active ?? false)
+        .Sum(item => item.Quantity * (item.ProductNav?.Price ?? 0));
 }
 
 <!-- Toast Notification -->
@@ -38,8 +41,7 @@
                 </div>
                 <div class="text-end">
                     <div class="badge bg-custom-primary fs-6 px-3 py-2 cart-summary-badge">
-                        <i class="bi bi-currency-dollar me-1"></i>
-                        Tổng cộng: @string.Format("{0:N0}", subtotal) VNĐ
+                        Tổng cộng: <span id="headerSubtotal">@string.Format("{0:N0}", subtotal)</span> VND
                     </div>
                 </div>
             </div>
@@ -69,6 +71,7 @@
                                         <th class="text-center" style="width:120px;">Số lượng</th>
                                         <th class="text-end" style="width:150px;">Giá</th>
                                         <th class="text-end" style="width:150px;">Tổng</th>
+                                        <th class="text-center" style="width:60px;">Xoá</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -77,34 +80,58 @@
                                         var i = 0;
                                         foreach (var item in Model)
                                         {
-                                            <tr data-row>
+                                            var inactive = !(item.ProductNav?.Active ?? false);
+                                            <tr data-row data-inactive="@inactive" class="@(inactive ? "inactive-row" : "")">
                                                 <td class="text-center">
-                                                    <input type="checkbox" name="selectedIds" value="@item.Id" class="form-check-input" />
+                                                    <input type="checkbox" name="SelectedIds" value="@item.Id"
+                                                           class="form-check-input" @(inactive ? "disabled" : "") />
                                                 </td>
                                                 <td>
                                                     <div class="d-flex align-items-center">
                                                         <img src="@(string.IsNullOrEmpty(item.ProductNav?.ImageUrl)
-                                        ? "/placeholder.svg?height=60&width=60"
-                                        : Url.Content("~/uploads/" + item.ProductNav!.ImageUrl))"
+                                                                ? "/placeholder.svg?height=60&width=60"
+                                                                : Url.Content("~/uploads/" + item.ProductNav!.ImageUrl))"
                                                              alt="@item.ProductNav?.Name" class="rounded me-3"
                                                              style="width:60px;height:60px;object-fit:cover;" />
-                                                        <span class="fw-semibold">@item.ProductNav?.Name</span>
+                                                        <div>
+                                                            <div class="fw-semibold">@item.ProductNav?.Name</div>
+                                                            @if (inactive)
+                                                            {
+                                                                <div class="small text-danger d-flex align-items-center gap-2">
+                                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                                                                        Ngừng bán
+                                                                    </span>
+                                                                    <span>Sản phẩm hiện tại chưa thể thanh toán</span>
+                                                                </div>
+                                                            }
+                                                        </div>
                                                     </div>
                                                 </td>
                                                 <td class="text-center">
-                                                    <!-- BẮT BUỘC: bind theo dạng List<Cart> CartItems -->
                                                     <input type="hidden" name="CartItems[@i].Id" value="@item.Id" />
                                                     <input type="number"
                                                            name="CartItems[@i].Quantity"
                                                            value="@item.Quantity"
                                                            min="1"
-                                                           class="form-control form-control-sm text-center quantity-input" />
+                                                           class="form-control form-control-sm text-center quantity-input"
+                                                    @(inactive ? "disabled" : "") />
                                                 </td>
                                                 <td class="text-end unit-price" data-price="@(@item.ProductNav?.Price ?? 0)">
-                                                    @string.Format("{0:N0}", (item.ProductNav?.Price ?? 0)) VNĐ
+                                                    @string.Format("{0:N0}", (item.ProductNav?.Price ?? 0)) VND
                                                 </td>
                                                 <td class="text-end fw-bold text-custom-primary line-total">
-                                                    @string.Format("{0:N0}", item.Quantity * (item.ProductNav?.Price ?? 0)) VNĐ
+                                                    @string.Format("{0:N0}", item.Quantity * (item.ProductNav?.Price ?? 0)) VND
+                                                </td>
+                                                <td class="text-center">
+                                                    <button type="submit"
+                                                            formaction="/Cart/DeleteSelected"
+                                                            formmethod="post"
+                                                            name="SelectedIds"
+                                                            value="@item.Id"
+                                                            class="btn btn-icon-trash"
+                                                            title="Xoá sản phẩm này">
+                                                        <i class="bi bi-trash3"></i>
+                                                    </button>
                                                 </td>
                                             </tr>
                                             i++;
@@ -112,11 +139,42 @@
                                     }
                                     else
                                     {
-                                        <tr><td colspan="5" class="text-center text-muted py-4">Giỏ hàng của bạn đang trống.</td></tr>
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted py-4">
+                                                Giỏ hàng của bạn đang trống.
+                                            </td>
+                                        </tr>
                                     }
                                 </tbody>
                             </table>
                         </div>
+
+                        <!-- Shipping info (đặt ngoài bảng cho đúng HTML) -->
+                        <div class="border-top p-3 bg-white">
+                            <h6 class="mb-3 text-custom-primary">
+                                <i class="bi bi-truck me-2"></i> Thông tin nhận hàng
+                            </h6>
+
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Người nhận <span class="text-danger">*</span></label>
+                                    <input name="receiverName" class="form-control" required />   <!-- THÊM -->
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+                                    <input name="receiverPhone" value="@ViewBag.DefaultPhone" class="form-control" required />
+                                </div>
+                                <div class="col-md-8">
+                                    <label class="form-label">Địa chỉ nhận hàng <span class="text-danger">*</span></label>
+                                    <input name="shippingAddress" value="@ViewBag.DefaultAddress" class="form-control" required />
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Ghi chú (tuỳ chọn)</label>
+                                    <textarea name="note" class="form-control" rows="2"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
 
                         <div class="d-flex justify-content-between align-items-center py-3 bg-light border-top">
                             <div>
@@ -126,10 +184,10 @@
                             </div>
                             <div class="d-flex align-items-center gap-3">
                                 <div class="badge bg-custom-primary fs-6 px-3 py-2 cart-summary-badge">
-                                    Tổng cộng: <span id="subtotalSpan">@string.Format("{0:N0}", subtotal)</span> VNĐ
+                                    Tổng cộng: <span id="subtotalSpan">@string.Format("{0:N0}", subtotal)</span> VND
                                 </div>
                                 <button type="submit" formaction="/Cart/Checkout" formmethod="post" class="btn btn-custom-primary btn-lg">
-                                    <i class="bi bi-credit-card-2-front me-2"></i> Thanh toán
+                                    <i class="bi bi-credit-card-2-front me-2"></i> Đặt hàng
                                 </button>
                             </div>
                         </div>
@@ -141,6 +199,33 @@
 </div>
 
 <style>
+    .btn-icon-trash {
+        background: transparent;
+        border: none;
+        color: #dc3545;
+        font-size: 1.1rem;
+        padding: .25rem .5rem;
+        border-radius: .375rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-icon-trash:hover {
+            background: rgba(220,53,69,.1);
+            color: #b02a37;
+            transform: translateY(-1px);
+        }
+
+    /* Inactive row styling */
+    .inactive-row {
+        opacity: 0.6;
+        filter: grayscale(.6);
+    }
+
+        .inactive-row .quantity-input {
+            pointer-events: none;
+            background-color: #f1f3f5;
+        }
+
     /* Custom Primary Color Variables */
     :root {
         --custom-primary: #212529;
@@ -150,7 +235,6 @@
         --gradient-primary: linear-gradient(135deg, #212529 0%, #343a40 100%);
     }
 
-    /* Custom Primary Color Classes */
     .text-custom-primary {
         color: var(--custom-primary) !important;
     }
@@ -164,12 +248,10 @@
         color: white;
     }
 
-    /* Header Styling */
     .bg-gradient {
         background: var(--gradient-primary) !important;
     }
 
-    /* Card Styling */
     .card {
         transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         border: 1px solid rgba(0,0,0,0.05);
@@ -180,13 +262,11 @@
         box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important;
     }
 
-    /* Toast Styling */
     .toast.bg-custom-primary {
         background: var(--gradient-primary) !important;
         border-radius: 0.5rem;
     }
 
-    /* Badge Styling */
     .badge {
         font-size: 0.75rem;
         font-weight: 500;
@@ -194,7 +274,6 @@
         padding: 0.25rem 0.5rem;
     }
 
-    /* Header Badge */
     .cart-summary-badge {
         font-size: 0.9rem !important;
         padding: 0.5rem 1rem;
@@ -203,17 +282,6 @@
         box-shadow: 0 2px 8px var(--custom-primary-shadow);
     }
 
-    /* Card Headers */
-    .card-header {
-        border-bottom: 1px solid rgba(0,0,0,0.05);
-    }
-
-    .card-header h6 {
-        font-size: 0.95rem;
-        letter-spacing: 0.025em;
-    }
-
-    /* Table Styling */
     .cart-table thead th {
         font-weight: 600;
         color: var(--custom-primary);
@@ -235,7 +303,6 @@
         border-color: #dee2e6;
     }
 
-    /* Checkout Button */
     .btn-custom-primary {
         background: var(--gradient-primary);
         border: none;
@@ -245,49 +312,58 @@
         box-shadow: 0 4px 12px var(--custom-primary-shadow);
     }
 
-    .btn-custom-primary:hover {
-        background: linear-gradient(135deg, var(--custom-primary-hover) 0%, #16191d 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 18px var(--custom-primary-shadow);
-        color: white;
-    }
+        .btn-custom-primary:hover {
+            background: linear-gradient(135deg, var(--custom-primary-hover) 0%, #16191d 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px var(--custom-primary-shadow);
+            color: white;
+        }
 </style>
 
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Toast functionality
+            // Toast
             const toastEl = document.querySelector('.toast');
             if (toastEl) {
-                const toast = new bootstrap.Toast(toastEl, {
-                    delay: 5000,
-                    animation: true
-                });
+                const toast = new bootstrap.Toast(toastEl, { delay: 5000, animation: true });
                 toast.show();
             }
 
-            // Check All functionality
-            document.getElementById("checkAll").addEventListener("change", function () {
+            // Check All: chỉ check checkbox KHÔNG disabled
+            document.getElementById("checkAll")?.addEventListener("change", function () {
                 const isChecked = this.checked;
-                document.querySelectorAll("input[name='selectedIds']").forEach(c => c.checked = isChecked);
+                document.querySelectorAll("input[name='SelectedIds']:not(:disabled)")
+                    .forEach(c => c.checked = isChecked);
             });
+
+            // Recalc lần đầu
+            recalc();
         });
-            // Cập nhật tổng từng dòng + subtotal khi đổi số lượng
+
+        // Cập nhật tổng từng dòng + subtotal (bỏ qua hàng inactive)
         const fmt = new Intl.NumberFormat('vi-VN');
         function recalc() {
             let subtotal = 0;
             document.querySelectorAll('tr[data-row]').forEach(row => {
+                const isInactive = row.getAttribute('data-inactive') === 'True' || row.getAttribute('data-inactive') === 'true';
                 const qtyInput = row.querySelector('.quantity-input');
                 const priceEl = row.querySelector('.unit-price');
                 const lineTotalEl = row.querySelector('.line-total');
+
                 const price = Number(priceEl?.dataset.price || 0);
                 const qty = Math.max(1, Number(qtyInput?.value || 1));
                 const line = price * qty;
-                lineTotalEl.textContent = fmt.format(line) + ' VNĐ';
-                subtotal += line;
+
+                lineTotalEl.textContent = fmt.format(line) + ' VND';
+                if (!isInactive) subtotal += line;
             });
+
             const subtotalSpan = document.getElementById('subtotalSpan');
             if (subtotalSpan) subtotalSpan.textContent = fmt.format(subtotal);
+
+            const headerSubtotal = document.getElementById('headerSubtotal');
+            if (headerSubtotal) headerSubtotal.textContent = fmt.format(subtotal);
         }
         document.querySelectorAll('.quantity-input').forEach(inp => {
             inp.addEventListener('input', recalc);

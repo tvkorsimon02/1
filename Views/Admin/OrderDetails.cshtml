@@ -141,19 +141,39 @@
                                 <tbody>
                                     @foreach (var d in Model.OrderDetails)
                                     {
+                                        var product = d.ProductNav;       // có thể null nếu sau này xóa cứng (nên tránh)
                                         <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <img src="@Url.Content($"~/uploads/{d.ProductNav?.ImageUrl}")" asp-append-version="true"
-                                                         class="product-image rounded shadow-sm"
-                                                         alt="@d.ProductNav?.Name" />
+                                            <td class="align-middle">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <img src="@(string.IsNullOrEmpty(product?.ImageUrl)
+                             ? "/placeholder.svg?height=40&width=40"
+                             : Url.Content("~/uploads/" + product!.ImageUrl))"
+                                                         style="width:40px;height:40px;object-fit:cover" class="rounded" />
+
+                                                    <div>
+                                                        <div class="fw-semibold">
+                                                            @(product?.Name ?? $"(SP #{d.Product})")
+                                                        </div>
+
+                                                        @* Nếu đã ẩn khỏi cửa hàng, vẫn hiển thị và gắn nhãn *@
+                                                        @if (product != null && !product.Active)
+                                                        {
+                                                            <span class="badge bg-secondary-subtle text-secondary border">
+                                                                Sản phẩm hiện đang ẩn khỏi cửa hàng
+                                                            </span>
+                                                        }
+                                                    </div>
                                                 </div>
                                             </td>
-                                            <td class="text-end">@string.Format("{0:N0}", d.Price) VNĐ</td>
+
                                             <td class="text-center">@d.Quantity</td>
-                                            <td class="text-end fw-bold text-custom-primary">@string.Format("{0:N0}", d.Quantity * d.Price) VNĐ</td>
+                                            <td class="text-end">@string.Format("{0:N0}", d.Price) VNĐ</td>
+                                            <td class="text-end fw-semibold">
+                                                @string.Format("{0:N0}", d.Price * d.Quantity) VNĐ
+                                            </td>
                                         </tr>
                                     }
+
                                 </tbody>
                             </table>
                         </div>

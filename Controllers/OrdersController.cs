@@ -84,27 +84,42 @@ namespace _1.Controllers
         [HttpPost]
         public IActionResult CancelOrder(int id)
         {
-            var order = _context.Orders.FirstOrDefault(o => o.Id == id);
+            var username = HttpContext.Session.GetString("username");
+            if (string.IsNullOrEmpty(username))
+                return RedirectToAction("Login", "Account");
+
+            var order = _context.Orders
+                .Include(o => o.OrderDetails)
+                .ThenInclude(od => od.ProductNav)
+                .FirstOrDefault(o => o.Id == id && o.Username == username);
+
             if (order == null)
             {
                 TempData["Message"] = "Đơn hàng không tồn tại!";
                 return RedirectToAction("MyOrders");
             }
 
-            // Chỉ hủy nếu trạng thái là "Chưa duyệt"
-            if (order.Status == 1)
+            if (order.Status == 1) // chỉ cho huỷ khi còn chờ duyệt
             {
-                order.Status = 6; // 6 = Đã huỷ
+                // trả kho
+                foreach (var d in order.OrderDetails!)
+                {
+                    if (d.ProductNav != null)
+                        d.ProductNav.Quantity += d.Quantity;
+                }
+
+                order.Status = 6; // đã huỷ
                 _context.SaveChanges();
-                TempData["Message"] = "Đơn hàng đã được hủy thành công.";
+                TempData["Message"] = "Đơn hàng đã được hủy và số lượng đã trả lại kho.";
             }
             else
             {
                 TempData["Message"] = "Đơn hàng không thể hủy vì đã được xử lý!";
             }
 
-            return RedirectToAction("Details", new { id = id });
+            return RedirectToAction("Details", new { id });
         }
+
 
     }
 
